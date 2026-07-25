@@ -1,4 +1,4 @@
-# Clipboard History Extension - Development Plan
+# Kravoxin Extension - Development Plan
 
 ## Phase 1 (Current)
 - [x] Step 1: Create the extension structure.

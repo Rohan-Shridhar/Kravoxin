@@ -1,4 +1,4 @@
-# Clipboard History Extension
+# Kravoxin Extension
 
 A lightweight, modern Chrome Extension that captures and saves your copied text snippets locally.
 

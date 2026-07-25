@@ -43,7 +43,7 @@ document.addEventListener('copy', () => {
       text: selectedText
     }).catch(err => {
       // Catch connection errors if the extension is reloaded/inactive
-      console.debug('Clipboard History: Error sending message', err);
+      console.debug('Kravoxin: Error sending message', err);
     });
   }
 });

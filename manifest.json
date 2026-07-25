@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Clipboard History",
+  "name": "Kravoxin",
   "version": "1.0.0",
   "description": "Keeps a history of text copied to clipboard.",
   "permissions": [

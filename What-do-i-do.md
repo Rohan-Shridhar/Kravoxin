@@ -1,4 +1,4 @@
-# 📋 Clipboard History Extension
+# 📋 Kravoxin Extension
 
 > A lightweight Chrome extension that stores copied text from web pages so it can be reused later.
 
