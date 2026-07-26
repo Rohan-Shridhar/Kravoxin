@@ -1,4 +1,4 @@
-# Kravoxin Extension
+# Kravoxin Extension (v1.0.0)
 
 A lightweight, modern Chrome Extension that captures and saves your copied text snippets locally.
 
