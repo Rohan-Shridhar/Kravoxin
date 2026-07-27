@@ -55,4 +55,4 @@ async function deleteHistoryItem(index) {
 async function clearAllHistory() {
   await saveHistory([]);
 }
-
+}
