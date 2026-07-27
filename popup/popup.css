@@ -197,10 +197,13 @@ body {
   color: var(--text-primary);
   white-space: pre-wrap;
   word-break: break-word;
-  max-height: 120px;
-  overflow-y: auto;
-  padding-right: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
 
 /* Small custom scrollbar for text cards if they overflow */
 .item-content::-webkit-scrollbar {
