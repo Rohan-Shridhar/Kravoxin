@@ -48,4 +48,11 @@ async function deleteHistoryItem(index) {
     history.splice(index, 1);
     await saveHistory(history);
   }
+/**
+ * Clears all items from clipboard history.
+ * @returns {Promise<void>}
+ */
+async function clearAllHistory() {
+  await saveHistory([]);
+}
 }

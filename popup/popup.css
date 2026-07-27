@@ -74,7 +74,29 @@ body {
   padding: 2px 8px;
   border-radius: 9999px;
   border: 1px solid rgba(99, 102, 241, 0.2);
+  text-decoration: none;
 }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-clear-all {
+  padding: 4px 8px;
+  font-size: 11px;
+  background-color: var(--danger-glow);
+  color: var(--danger-color);
+  border: 1px solid rgba(244, 63, 94, 0.2);
+}
+
+.btn-clear-all:hover {
+  background-color: var(--danger-color);
+  color: #ffffff;
+  box-shadow: 0 0 8px var(--danger-glow);
+}
+
 
 /* Main Area */
 .app-main {
