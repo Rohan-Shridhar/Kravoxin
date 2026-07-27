@@ -77,6 +77,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const clearAllBtn = document.getElementById('clear-all-btn');
+
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener('click', async () => {
+      const history = await getHistory();
+      if (history.length === 0) return;
+
+      await clearAllHistory();
+      await renderHistory();
+    });
+  }
+
   // Initial render
   await renderHistory();
 });
