@@ -20,12 +20,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       const li = document.createElement('li');
       li.className = 'history-item';
 
+      if (item.favorite) {
+        li.classList.add('is-favorite');
+      }
+
       const contentDiv = document.createElement('div');
       contentDiv.className = 'item-content';
       contentDiv.textContent = item.text;
 
       const actionsDiv = document.createElement('div');
       actionsDiv.className = 'item-actions';
+
+      const favoriteBtn = document.createElement('button');
+      favoriteBtn.className = 'btn btn-favorite';
+      favoriteBtn.setAttribute('aria-pressed', String(item.favorite));
+      favoriteBtn.title = item.favorite ? 'Remove favorite' : 'Add favorite';
+      favoriteBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="${item.favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3.25l2.6 5.27 5.82.85-4.21 4.1 1 5.77L12 16.09l-5.21 2.24 1-5.77-4.21-4.1 5.82-.85L12 3.25z" />
+        </svg>
+      `;
+      favoriteBtn.addEventListener('click', async () => {
+        await toggleFavoriteHistoryItem(index);
+        await renderHistory();
+      });
 
       // Copy Button
       const copyBtn = document.createElement('button');
@@ -66,9 +84,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Remove item from storage using its index
         await deleteHistoryItem(index);
         // Re-render the history view
-        renderHistory();
+        await renderHistory();
       });
 
+      actionsDiv.appendChild(favoriteBtn);
       actionsDiv.appendChild(copyBtn);
       actionsDiv.appendChild(deleteBtn);
       li.appendChild(contentDiv);

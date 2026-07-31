@@ -1,13 +1,31 @@
 // Storage Helper functions
 
 /**
+ * Normalizes existing history entries to the current shape.
+ * @param {Array} history
+ * @returns {Array}
+ */
+function normalizeHistory(history) {
+  return history.map((item) => {
+    if (typeof item === 'string') {
+      return { text: item, favorite: false };
+    }
+
+    return {
+      text: item?.text ?? '',
+      favorite: Boolean(item?.favorite)
+    };
+  });
+}
+
+/**
  * Gets the clipboard history list from local storage.
- * @returns {Promise<Array>} Array of items: { text: string }
+ * @returns {Promise<Array>} Array of items: { text: string, favorite: boolean }
  */
 async function getHistory() {
   return new Promise((resolve) => {
     chrome.storage.local.get({ history: [] }, (result) => {
-      resolve(result.history);
+      resolve(normalizeHistory(result.history));
     });
   });
 }
@@ -19,7 +37,7 @@ async function getHistory() {
  */
 async function saveHistory(history) {
   return new Promise((resolve) => {
-    chrome.storage.local.set({ history }, () => {
+    chrome.storage.local.set({ history: normalizeHistory(history) }, () => {
       resolve();
     });
   });
@@ -33,7 +51,7 @@ async function saveHistory(history) {
 async function addHistoryItem(text) {
   const history = await getHistory();
   // Newest items should appear first
-  history.unshift({ text });
+  history.unshift({ text, favorite: false });
   await saveHistory(history);
 }
 
@@ -51,9 +69,24 @@ async function deleteHistoryItem(index) {
 }
 
 /**
- * Clears all items from clipboard history.
+ * Toggles the favorite state for a history item.
+ * @param {number} index
+ * @returns {Promise<void>}
+ */
+async function toggleFavoriteHistoryItem(index) {
+  const history = await getHistory();
+  if (index >= 0 && index < history.length) {
+    history[index].favorite = !history[index].favorite;
+    await saveHistory(history);
+  }
+}
+
+/**
+ * Clears all non-favorite items from clipboard history.
  * @returns {Promise<void>}
  */
 async function clearAllHistory() {
-  await saveHistory([]);
+  const history = await getHistory();
+  const favoritesOnly = history.filter((item) => item.favorite);
+  await saveHistory(favoritesOnly);
 }
