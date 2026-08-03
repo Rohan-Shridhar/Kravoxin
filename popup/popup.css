@@ -8,6 +8,8 @@
   --text-secondary: #94a3b8;
   --primary-color: #6366f1;
   --primary-glow: rgba(99, 102, 241, 0.15);
+  --success-color: #14b8a6;
+  --success-glow: rgba(20, 184, 166, 0.15);
   --danger-color: #f43f5e;
   --danger-glow: rgba(244, 63, 94, 0.15);
   --favorite-color: #f59e0b;
@@ -276,6 +278,23 @@ body {
   box-shadow: 0 0 8px var(--primary-color);
 }
 
+.btn-cut {
+  background-color: var(--success-glow);
+  color: var(--success-color);
+  border: 1px solid rgba(20, 184, 166, 0.1);
+}
+
+.btn-cut:hover:not(:disabled) {
+  background-color: var(--success-color);
+  color: white;
+  box-shadow: 0 0 8px var(--success-color);
+}
+
+.btn-cut:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 .btn-delete {
   background-color: var(--danger-glow);
   color: var(--danger-color);
@@ -296,4 +315,35 @@ body {
 .history-item.is-favorite {
   border-color: rgba(245, 158, 11, 0.4);
   box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.2);
+}
+
+.status-message {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 12px;
+  z-index: 2;
+  padding: 9px 12px;
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--success-color);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.status-message.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.status-message[data-tone="error"] {
+  border-color: rgba(244, 63, 94, 0.3);
+  color: var(--danger-color);
 }

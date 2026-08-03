@@ -4,7 +4,8 @@
   "version": "1.2.0",
   "description": "Keeps a history of text copied to clipboard.",
   "permissions": [
-    "storage"
+    "storage",
+    "clipboardWrite"
   ],
   "background": {
     "service_worker": "scripts/background.js"

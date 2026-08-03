@@ -1,6 +1,21 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const historyList = document.getElementById('history-list');
   const emptyState = document.getElementById('empty-state');
+  const statusMessage = document.getElementById('status-message');
+  let statusTimeoutId;
+
+  function showStatus(message, tone = 'success') {
+    if (!statusMessage) return;
+
+    window.clearTimeout(statusTimeoutId);
+    statusMessage.textContent = message;
+    statusMessage.dataset.tone = tone;
+    statusMessage.classList.add('is-visible');
+
+    statusTimeoutId = window.setTimeout(() => {
+      statusMessage.classList.remove('is-visible');
+    }, 1800);
+  }
 
   // Load and render history items
   async function renderHistory() {
@@ -71,6 +86,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
 
+      // Cut Button
+      const cutBtn = document.createElement('button');
+      cutBtn.className = 'btn btn-cut';
+      cutBtn.title = 'Cut snippet';
+      cutBtn.setAttribute('aria-label', 'Cut snippet');
+      cutBtn.innerHTML = `
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="6" cy="6" r="2.5"></circle>
+          <circle cx="6" cy="18" r="2.5"></circle>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.2 7.5L19 3M8.2 16.5L19 21M8.2 7.5L16 15.3"></path>
+        </svg>
+        <span>Cut</span>
+      `;
+      cutBtn.addEventListener('click', async () => {
+        cutBtn.disabled = true;
+
+        try {
+          if (!navigator.clipboard?.writeText) {
+            throw new Error('Clipboard API is unavailable');
+          }
+
+          await navigator.clipboard.writeText(item.text);
+          await deleteHistoryItem(index);
+          showStatus('Snippet cut to clipboard.');
+          await renderHistory();
+        } catch (err) {
+          console.error('Failed to cut text: ', err);
+          cutBtn.disabled = false;
+          showStatus('Could not cut snippet. It was kept.', 'error');
+        }
+      });
+
       // Delete Button
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'btn btn-delete';
@@ -89,6 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       actionsDiv.appendChild(favoriteBtn);
       actionsDiv.appendChild(copyBtn);
+      actionsDiv.appendChild(cutBtn);
       actionsDiv.appendChild(deleteBtn);
       li.appendChild(contentDiv);
       li.appendChild(actionsDiv);
