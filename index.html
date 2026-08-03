@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kravoxin - Clipboard History Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #0a0e27;
+      --bg-secondary: #0f1535;
+      --bg-tertiary: #151d3a;
+      --accent-primary: #6366f1;
+      --accent-secondary: #ec4899;
+      --accent-tertiary: #14b8a6;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-tertiary: #94a3b8;
+      --border-color: rgba(99, 102, 241, 0.1);
+      --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+    }
+
+    /* Starfield Background */
+    .starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    /* Gradient Orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.15;
+      z-index: -1;
+    }
+
+    .orb-1 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, var(--accent-primary), transparent);
+      top: -100px;
+      left: -100px;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--accent-secondary), transparent);
+      top: 50%;
+      right: -50px;
+      animation: float 25s ease-in-out infinite reverse;
+    }
+
+    .orb-3 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, var(--accent-tertiary), transparent);
+      bottom: -100px;
+      left: 30%;
+      animation: float 30s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      50% { transform: translateY(40px) translateX(20px); }
+    }
+
+    /* Navigation */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 14, 39, 0.7);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-logo svg {
+      width: 32px;
+      height: 32px;
+      color: var(--accent-primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--accent-primary);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after,
+    .nav-links a.active::after {
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      position: relative;
+    }
+
+    .hero-content {
+      text-align: center;
+      max-width: 800px;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 0.5rem 1.5rem;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid var(--border-color);
+      border-radius: 50px;
+      color: var(--accent-primary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.5px;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: var(--font-sans);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: white;
+      border: 2px solid transparent;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--accent-primary);
+      border: 2px solid var(--accent-primary);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(99, 102, 241, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* Sections */
+    section {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      text-align: center;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background: rgba(15, 21, 53, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.1);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    .feature-card p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Install Section */
+    .install-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .install-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .step-number {
+      min-width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-content h3 {
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .step-content p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .install-image {
+      position: relative;
+      height: 400px;
+      background: rgba(99, 102, 241, 0.05);
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+
+    /* Contact Section */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .contact-card {
+      background: rgba(15, 21, 53, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .contact-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-5px);
+    }
+
+    .contact-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .contact-card h3 {
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .contact-card a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      word-break: break-all;
+      transition: color 0.3s ease;
+    }
+
+    .contact-card a:hover {
+      color: var(--accent-secondary);
+    }
+
+    /* Bug Report Form */
+    .bug-form {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(15, 21, 53, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2.5rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background: rgba(99, 102, 241, 0.05);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    /* Footer */
+    footer {
+      background: rgba(10, 14, 39, 0.7);
+      border-top: 1px solid var(--border-color);
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-tertiary);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in-on-scroll {
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      .install-content {
+        grid-template-columns: 1fr;
+      }
+
+      .install-image {
+        height: 250px;
+      }
+
+      .section-title {
+        font-size: 1.8rem;
+      }
+
+      section {
+        padding: 3rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Starfield Background -->
+  <div class="starfield" id="starfield"></div>
+  
+  <!-- Gradient Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <div class="nav-logo">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 3H14.82C14.4 1.84 13.3 1 12 1C10.7 1 9.6 1.84 9.18 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM12 3C12.55 3 13 3.45 13 4C13 4.55 12.55 5 12 5C11.45 5 11 4.55 11 4C11 3.45 11.45 3 12 3ZM19 19H5V5H7V7H17V5H19V19Z" fill="currentColor"/>
+        </svg>
+        Kravoxin
+      </div>
+      <ul class="nav-links">
+        <li><a href="#home" class="nav-link active">Home</a></li>
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#install" class="nav-link">Install</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+        <li><a href="#bug" class="nav-link">Report Bug</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <div class="hero-badge">🚀 Explore Your Clipboard</div>
+      <h1>Kravoxin</h1>
+      <p>A lightweight Chrome extension that captures and organizes your clipboard history. Never lose a copied snippet again.</p>
+      <div class="hero-buttons">
+        <a href="#install" class="btn btn-primary">Get Started</a>
+        <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" class="btn btn-secondary">View on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features">
+    <h2 class="section-title">Features</h2>
+    <div class="features-grid">
+      <div class="feature-card fade-in-on-scroll">
+        <div class="feature-icon">📋</div>
+        <h3>Auto Capture</h3>
+        <p>Every text you copy on a webpage is automatically saved to your history with zero effort required.</p>
+      </div>
+
+      <div class="feature-card fade-in-on-scroll">
+        <div class="feature-icon">💾</div>
+        <h3>Local Storage</h3>
+        <p>All your clipboard history is stored securely on your device in chrome.storage.local. No cloud sync, complete privacy.</p>
+      </div>
+
+      <div class="feature-card fade-in-on-scroll">
+        <div class="feature-icon">⚡</div>
+        <h3>Lightning Fast</h3>
+        <p>Minimal footprint. Instant access to your clipboard history through the clean, intuitive popup interface.</p>
+      </div>
+
+      <div class="feature-card fade-in-on-scroll">
+        <div class="feature-icon">❤️</div>
+        <h3>Favorite Items</h3>
+        <p>Mark important snippets as favorites to keep them safe from bulk deletions.</p>
+      </div>
+
+      <div class="feature-card fade-in-on-scroll">
+        <div class="feature-icon">🗑️</div>
+        <h3>Easy Deletion</h3>
+        <p>Remove unwanted items instantly or clear all non-favorite entries with one click.</p>
+      </div>
+
+      <div class="feature-card fade-in-on-scroll">
+        <div class="feature-icon">🎨</div>
+        <h3>Modern Design</h3>
+        <p>Beautiful dark theme with glassmorphism effects. A pleasure to look at and use.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Install Section -->
+  <section id="install">
+    <h2 class="section-title">Installation</h2>
+    <div class="install-content">
+      <div class="install-steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Download</h3>
+            <p>Clone or download the Kravoxin repository from GitHub.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Open Extensions</h3>
+            <p>Navigate to <code>chrome://extensions/</code> in your Chrome browser.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Enable Developer Mode</h3>
+            <p>Toggle the Developer mode switch in the top-right corner of the extensions page.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Load Unpacked</h3>
+            <p>Click "Load unpacked" and select the Kravoxin folder from your computer.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">5</div>
+          <div class="step-content">
+            <h3>Start Using</h3>
+            <p>Copy text anywhere on the web. Click the Kravoxin icon to view your clipboard history!</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="install-image">
+        🛸
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact">
+    <h2 class="section-title">Get in Touch</h2>
+    <div class="contact-grid">
+      <div class="contact-card fade-in-on-scroll">
+        <div class="contact-icon">🐙</div>
+        <h3>GitHub</h3>
+        <a href="https://github.com/Rohan-Shridhar" target="_blank">Rohan-Shridhar</a>
+      </div>
+
+      <div class="contact-card fade-in-on-scroll">
+        <div class="contact-icon">💼</div>
+        <h3>LinkedIn</h3>
+        <a href="https://www.linkedin.com/in/rohan-mirjankar/" target="_blank">rohan-mirjankar</a>
+      </div>
+
+      <div class="contact-card fade-in-on-scroll">
+        <div class="contact-icon">💬</div>
+        <h3>Discord</h3>
+        <a href="#">rayonbyte</a>
+      </div>
+
+      <div class="contact-card fade-in-on-scroll">
+        <div class="contact-icon">🌐</div>
+        <h3>Portfolio</h3>
+        <a href="https://rohan-mirjankar.carrd.co/" target="_blank">rohan-mirjankar</a>
+      </div>
+
+      <div class="contact-card fade-in-on-scroll">
+        <div class="contact-icon">✍️</div>
+        <h3>Dev Community</h3>
+        <a href="https://dev.to/rohan_mirjankar" target="_blank">@rohan_mirjankar</a>
+      </div>
+
+      <div class="contact-card fade-in-on-scroll">
+        <div class="contact-icon">📧</div>
+        <h3>Email</h3>
+        <a href="mailto:rohan@example.com">Get in Touch</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bug Report Section -->
+  <section id="bug">
+    <h2 class="section-title">Report a Bug</h2>
+    <form class="bug-form" id="bug-form">
+      <div class="form-group">
+        <label for="bug-title">Bug Title</label>
+        <input type="text" id="bug-title" name="title" placeholder="Brief description of the issue" required>
+      </div>
+
+      <div class="form-group">
+        <label for="bug-description">Description</label>
+        <textarea id="bug-description" name="description" placeholder="Detailed description of the bug, steps to reproduce, and expected behavior" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="bug-browser">Browser Info</label>
+        <input type="text" id="bug-browser" name="browser" placeholder="e.g., Chrome 120 on Windows 11" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Bug Report</button>
+    </form>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2024 Kravoxin. Built with ❤️ by <a href="https://rohan-mirjankar.carrd.co/" target="_blank" style="color: var(--accent-primary); text-decoration: none;">Rohan Mirjankar</a></p>
+    <p style="font-size: 0.85rem; margin-top: 0.5rem;">Made for the cosmos, built for the web.</p>
+  </footer>
+
+  <script>
+    // Generate Starfield
+    function generateStarfield() {
+      const starfield = document.getElementById('starfield');
+      const starCount = 100;
+
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        starfield.appendChild(star);
+      }
+    }
+
+    // Smooth scroll navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+
+    // Intersection Observer for fade-in animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationDelay = '0s';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in-on-scroll').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Update active nav link on scroll
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('section');
+      let current = '';
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 50) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').slice(1) === current) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // Bug Report Form Handler
+    document.getElementById('bug-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById('bug-title').value;
+      const description = document.getElementById('bug-description').value;
+      const browser = document.getElementById('bug-browser').value;
+
+      // Create GitHub issue URL
+      const body = encodeURIComponent(
+        `## Bug Report\n\n**Title:** ${title}\n\n**Description:**\n${description}\n\n**Browser Info:**\n${browser}`
+      );
+      const issueUrl = `https://github.com/Rohan-Shridhar/Kravoxin/issues/new?title=${encodeURIComponent(title)}&body=${body}`;
+
+      // Open GitHub issues page
+      window.open(issueUrl, '_blank');
+
+      // Reset form
+      e.target.reset();
+      alert('Opening GitHub to create an issue. Thank you for reporting!');
+    });
+
+    // Initialize
+    generateStarfield();
+  </script>
+</body>
+</html>
