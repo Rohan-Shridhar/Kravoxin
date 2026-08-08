@@ -43,6 +43,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       contentDiv.className = 'item-content';
       contentDiv.textContent = item.text;
 
+      const timestampEl = document.createElement('time');
+      timestampEl.className = 'item-timestamp';
+      timestampEl.textContent = item.timestamp
+        ? `Copied ${item.timestamp}`
+        : 'Copied time unavailable';
+      timestampEl.setAttribute(
+        'aria-label',
+        item.timestamp
+          ? `Copied at ${item.timestamp}`
+          : 'Copied time unavailable'
+      );
+
       const actionsDiv = document.createElement('div');
       actionsDiv.className = 'item-actions';
 
@@ -140,6 +152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       actionsDiv.appendChild(cutBtn);
       actionsDiv.appendChild(deleteBtn);
       li.appendChild(contentDiv);
+      li.appendChild(timestampEl);
       li.appendChild(actionsDiv);
       historyList.appendChild(li);
     });
