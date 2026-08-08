@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       copyBtn.addEventListener('click', async () => {
         try {
           await navigator.clipboard.writeText(item.text);
+          await markHistoryItemCopied(index);
           const span = copyBtn.querySelector('span');
           const originalText = span.textContent;
           span.textContent = 'Copied!';
