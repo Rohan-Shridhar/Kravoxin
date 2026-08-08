@@ -4,7 +4,7 @@ A lightweight, modern Chrome Extension that captures and saves your copied text 
 
 ## Features (Phase 1)
 - **Automatic Capturing**: Every time you copy text on a webpage, it is saved in local history.
-- **Local Storage**: All history is stored locally in `chrome.storage.local`.
+- **Local Storage**: All history and copy timestamps are stored locally in `chrome.storage.local`.
 - **Easy Re-copying**: Click the "Copy" button in the popup to write text back to clipboard.
 - **Fast Deletion**: Remove unwanted items instantly.
 
