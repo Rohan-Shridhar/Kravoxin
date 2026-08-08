@@ -1,6 +1,24 @@
 // Storage Helper functions
 
 /**
+ * Returns the current local date and time in yyyymmddhhmmss format.
+ * @param {Date} date
+ * @returns {string}
+ */
+function formatCopyTimestamp(date = new Date()) {
+  const pad = (value) => String(value).padStart(2, '0');
+
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate()),
+    pad(date.getHours()),
+    pad(date.getMinutes()),
+    pad(date.getSeconds())
+  ].join('');
+}
+
+/**
  * Normalizes existing history entries to the current shape.
  * @param {Array} history
  * @returns {Array}
@@ -8,19 +26,20 @@
 function normalizeHistory(history) {
   return history.map((item) => {
     if (typeof item === 'string') {
-      return { text: item, favorite: false };
+      return { text: item, favorite: false, timestamp: '' };
     }
 
     return {
       text: item?.text ?? '',
-      favorite: Boolean(item?.favorite)
+      favorite: Boolean(item?.favorite),
+      timestamp: typeof item?.timestamp === 'string' ? item.timestamp : ''
     };
   });
 }
 
 /**
  * Gets the clipboard history list from local storage.
- * @returns {Promise<Array>} Array of items: { text: string, favorite: boolean }
+ * @returns {Promise<Array>} Array of items: { text: string, favorite: boolean, timestamp: string }
  */
 async function getHistory() {
   return new Promise((resolve) => {
@@ -45,14 +64,28 @@ async function saveHistory(history) {
 
 /**
  * Adds a new item to the front of the history.
- * @param {string} text 
+ * @param {string} text
+ * @param {string} timestamp
  * @returns {Promise<void>}
  */
-async function addHistoryItem(text) {
+async function addHistoryItem(text, timestamp = formatCopyTimestamp()) {
   const history = await getHistory();
   // Newest items should appear first
-  history.unshift({ text, favorite: false });
+  history.unshift({ text, favorite: false, timestamp });
   await saveHistory(history);
+}
+
+/**
+ * Updates the timestamp for an existing history item after it is copied again.
+ * @param {number} index
+ * @returns {Promise<void>}
+ */
+async function markHistoryItemCopied(index) {
+  const history = await getHistory();
+  if (index >= 0 && index < history.length) {
+    history[index].timestamp = formatCopyTimestamp();
+    await saveHistory(history);
+  }
 }
 
 /**

@@ -13,7 +13,7 @@
 - Search functionality
 - Pinning items
 - Duplicate detection
-- Timestamps
+- [x] Timestamps in `yyyymmddhhmmss` format
 - Maximum history limit
 - Export / Import
 - Keyboard shortcuts
