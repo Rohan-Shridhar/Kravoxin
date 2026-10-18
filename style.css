@@ -1,0 +1,2236 @@
+/* ==========================================================================
+   Kravoxin - Official Landing Page Stylesheet
+   Design System & Vibe inspired by MongoDB (https://www.mongodb.com/)
+   Palette: Warm Ivory, Deep Forest Green, Signature Spring Green, Midnight Slate
+   ========================================================================== */
+
+:root {
+  /* MongoDB Color Tokens */
+  --bg-canvas: #fdfff5;
+  --bg-card: #ffffff;
+  --bg-container: #f1f5eb;
+  --bg-container-hover: #e8ede0;
+  
+  /* MongoDB Dark / Slate Tokens */
+  --bg-dark: #001e2b;
+  --bg-dark-surface: #023430;
+  --bg-dark-card: #072b38;
+  --bg-dark-card-hover: #0c3848;
+  --bg-dark-accent: #014e3d;
+  
+  /* MongoDB Brand Accents */
+  --brand-green: #00ed64;        /* MongoDB Signature Spring Green */
+  --brand-green-hover: #00ff6c;
+  --brand-green-subtle: rgba(0, 237, 100, 0.12);
+  --brand-green-glow: rgba(0, 237, 100, 0.35);
+  --brand-forest: #00684a;       /* MongoDB Deep Forest Green */
+  --brand-forest-hover: #014e3d;
+  --brand-lime: #b1ff05;         /* MongoDB Pill Lime */
+  --brand-blue: #006cfa;
+  --brand-blue-subtle: rgba(0, 108, 250, 0.1);
+  --accent-gold: #ffc010;
+  --accent-red: #ff4757;
+
+  /* Typography Colors */
+  --text-primary: #061621;
+  --text-secondary: #404f54;
+  --text-muted: #616c6d;
+  --text-inverse: #fdfff5;
+  --text-inverse-secondary: #c1c7c6;
+  --text-inverse-muted: #9ea2a1;
+
+  /* Borders & Dividers */
+  --border-light: #e4e8e0;
+  --border-subtle: #d0d4cf;
+  --border-dark: rgba(255, 255, 255, 0.12);
+  --border-dark-hover: rgba(0, 237, 100, 0.4);
+  --border-green: rgba(0, 237, 100, 0.25);
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(6, 22, 33, 0.05);
+  --shadow-sm: 0 2px 6px rgba(6, 22, 33, 0.06);
+  --shadow-md: 0 8px 24px rgba(6, 22, 33, 0.08);
+  --shadow-lg: 0 16px 44px rgba(6, 22, 33, 0.12);
+  --shadow-dark: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 28px rgba(0, 237, 100, 0.3);
+
+  /* Border Radii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Typography */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   Base & Resets
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 130px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+}
+
+::selection {
+  background: var(--brand-green);
+  color: var(--bg-dark);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+button, input, textarea, select {
+  font-family: inherit;
+}
+
+img, svg {
+  vertical-align: middle;
+}
+
+code, pre {
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   Announcement Pencil Banner (MongoDB Style)
+   ========================================================================== */
+.pencil-banner {
+  background-color: var(--brand-forest);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+  z-index: 1000;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pencil-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 40px;
+}
+
+.pencil-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.pencil-item {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.pencil-item.active {
+  display: flex;
+}
+
+.pencil-pill {
+  background-color: var(--brand-lime);
+  color: var(--bg-dark);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  display: inline-block;
+  line-height: 18px;
+}
+
+.pencil-text {
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.pencil-link {
+  color: var(--brand-lime);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: transform var(--transition-fast);
+}
+
+.pencil-link:hover {
+  text-decoration: underline;
+  transform: translateX(2px);
+}
+
+.pencil-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pencil-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.pencil-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ==========================================================================
+   Navigation Bar (MongoDB Style)
+   ========================================================================== */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background-color: rgba(253, 255, 245, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+  transition: box-shadow var(--transition-normal), background-color var(--transition-normal);
+}
+
+.site-nav.scrolled {
+  box-shadow: var(--shadow-sm);
+  background-color: rgba(253, 255, 245, 0.98);
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.brand-text {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.brand-text span {
+  color: var(--brand-forest);
+}
+
+.brand-version {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-container);
+  border: 1px solid var(--border-light);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  margin-left: 4px;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 20px;
+  flex-wrap: nowrap;
+}
+
+.nav-link {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--text-primary);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--brand-forest);
+  transition: width var(--transition-normal);
+}
+
+.nav-link:hover::after, .nav-link.active::after {
+  width: 100%;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nav-search-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  border: 1px solid var(--border-light);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.nav-search-btn:hover {
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+.kbd-shortcut {
+  background-color: var(--bg-container);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xs);
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.btn-github-stars {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  border: 1px solid var(--border-light);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+}
+
+.btn-github-stars:hover {
+  border-color: var(--text-primary);
+  background-color: var(--bg-container);
+}
+
+.star-count {
+  background: var(--bg-container);
+  border-radius: var(--radius-xs);
+  padding: 1px 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Buttons (MongoDB Design Standards)
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+/* MongoDB Primary Action Button (Signature Spring Green) */
+.btn-primary {
+  background-color: var(--brand-green);
+  color: var(--bg-dark);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 237, 100, 0.2);
+}
+
+.btn-primary:hover {
+  background-color: var(--brand-green-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 237, 100, 0.35);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* MongoDB Forest Green Button */
+.btn-forest {
+  background-color: var(--brand-forest);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-forest:hover {
+  background-color: var(--brand-forest-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 104, 74, 0.25);
+}
+
+/* MongoDB Secondary Outline Button */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(6, 22, 33, 0.05);
+  transform: translateY(-1px);
+}
+
+/* Dark mode buttons */
+.btn-dark-secondary {
+  background-color: transparent;
+  color: var(--text-inverse);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-dark-secondary:hover {
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
+.btn-lg {
+  padding: 14px 28px;
+  font-size: 16px;
+  border-radius: var(--radius-sm);
+}
+
+.mobile-menu-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  padding: 8px;
+  font-size: 20px;
+}
+
+/* ==========================================================================
+   Hero Section (MongoDB Inspired)
+   ========================================================================== */
+.hero-section {
+  padding: 60px 32px 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--bg-container);
+  border: 1px solid var(--border-light);
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--brand-forest);
+  margin-bottom: 24px;
+}
+
+.eyebrow-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--brand-forest);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(0, 104, 74, 0.15);
+  animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.hero-title {
+  font-size: 58px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
+
+.hero-title-highlight {
+  color: var(--brand-forest);
+  position: relative;
+  display: inline-block;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin-bottom: 36px;
+  max-width: 580px;
+}
+
+.hero-cta-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.hero-trust-list {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  list-style: none;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.hero-trust-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-trust-list i {
+  color: var(--brand-forest);
+  font-size: 14px;
+}
+
+/* ==========================================================================
+   Hero Interactive Demo Console (Kravoxin Simulator + Storage Sync)
+   ========================================================================== */
+.hero-demo-wrapper {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  position: relative;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.hero-demo-wrapper:hover {
+  box-shadow: 0 20px 50px rgba(6, 22, 33, 0.15);
+}
+
+.demo-header-bar {
+  background: var(--bg-container);
+  border-bottom: 1px solid var(--border-light);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.window-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot-red { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green { background: #27c93f; }
+
+.demo-tabs-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.demo-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.demo-tab-btn.active {
+  background: #ffffff;
+  color: var(--brand-forest);
+  box-shadow: var(--shadow-xs);
+}
+
+.demo-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--brand-forest);
+  background: rgba(0, 104, 74, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.demo-live-badge .pulse {
+  width: 6px;
+  height: 6px;
+  background: var(--brand-green);
+  border-radius: 50%;
+  animation: pulseDot 1.5s infinite;
+}
+
+/* Tab 1: Virtual Extension Simulator */
+.demo-content-pane {
+  display: none;
+  padding: 20px;
+}
+
+.demo-content-pane.active {
+  display: block;
+}
+
+.simulator-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 16px;
+}
+
+/* Left side of simulator: Sample Web Page snippets to copy */
+.web-sample-box {
+  background: var(--bg-canvas);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sample-box-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sample-box-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.sample-snippet-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sample-snippet-card:hover {
+  border-color: var(--brand-forest);
+  box-shadow: var(--shadow-xs);
+  transform: translateX(2px);
+}
+
+.snippet-text-content {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.snippet-copy-action {
+  background: var(--bg-container);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xs);
+  padding: 3px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--brand-forest);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.custom-copy-input-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.custom-copy-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  background: #ffffff;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.custom-copy-input:focus {
+  border-color: var(--brand-forest);
+}
+
+.custom-copy-btn {
+  background: var(--brand-forest);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Right side of simulator: Kravoxin Virtual Popup Mockup */
+.virtual-popup {
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  height: 380px;
+  overflow: hidden;
+}
+
+.v-popup-header {
+  padding: 12px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.v-popup-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.v-popup-brand svg {
+  width: 18px;
+  height: 18px;
+  color: var(--brand-forest);
+}
+
+.v-popup-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.v-btn-clear {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xs);
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+}
+
+.v-btn-clear:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: var(--accent-red);
+}
+
+.v-badge-author {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--brand-forest);
+  background: rgba(0, 104, 74, 0.08);
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+}
+
+.v-search-bar {
+  padding: 8px 14px;
+  background: var(--bg-canvas);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.v-search-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  outline: none;
+  color: var(--text-primary);
+}
+
+.v-popup-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.v-history-item {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all var(--transition-fast);
+  animation: slideInDown 0.3s ease;
+}
+
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.v-history-item:hover {
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-xs);
+}
+
+.v-history-item.is-favorite {
+  border-left: 3px solid var(--accent-gold);
+  background: #fffdf7;
+}
+
+.v-item-text {
+  font-size: 12.5px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  word-break: break-all;
+  max-height: 40px;
+  overflow: hidden;
+}
+
+.v-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.v-item-time {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.v-item-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.v-action-btn {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xs);
+  padding: 2px 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+}
+
+.v-action-btn:hover {
+  background: var(--bg-container);
+  color: var(--text-primary);
+}
+
+.v-action-btn.star-btn.active {
+  color: var(--accent-gold);
+  border-color: rgba(255, 192, 16, 0.4);
+}
+
+.v-action-btn.delete-btn:hover {
+  color: var(--accent-red);
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+/* Tab 2: Storage JSON Viewer */
+.code-viewer-container {
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #e6edf3;
+  max-height: 380px;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+
+.code-viewer-container .json-key { color: #7ee787; }
+.code-viewer-container .json-string { color: #a5d6ff; }
+.code-viewer-container .json-boolean { color: #ff7b72; }
+.code-viewer-container .json-number { color: #d2a8ff; }
+
+/* Tab 3: Architecture Diagram */
+.arch-diagram-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 12px;
+}
+
+.arch-node {
+  background: var(--bg-container);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.arch-node-badge {
+  background: var(--brand-forest);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+}
+
+.arch-node-content h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.arch-node-content p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.arch-arrow {
+  text-align: center;
+  color: var(--brand-forest);
+  font-size: 14px;
+}
+
+/* ==========================================================================
+   Trust / Ecosystem Bar (MongoDB Logo Strip)
+   ========================================================================== */
+.ecosystem-section {
+  padding: 48px 32px;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  background: #ffffff;
+}
+
+.ecosystem-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.ecosystem-title {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+
+.browser-logos-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 24px;
+  align-items: center;
+  justify-items: center;
+}
+
+.browser-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  width: 100%;
+  justify-content: center;
+}
+
+.browser-card:hover {
+  border-color: var(--brand-forest);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.browser-card i, .browser-card svg {
+  font-size: 20px;
+}
+
+/* Metrics Row */
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px dashed var(--border-light);
+}
+
+.metric-item {
+  text-align: center;
+}
+
+.metric-val {
+  font-size: 38px;
+  font-weight: 800;
+  color: var(--brand-forest);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.metric-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   Dark Section: The Kravoxin Core Architecture (MongoDB Atlas Theme)
+   ========================================================================== */
+.dark-section {
+  background-color: var(--bg-dark);
+  color: var(--text-inverse);
+  padding: 100px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dark-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 237, 100, 0.08), transparent 70%);
+  pointer-events: none;
+}
+
+.dark-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.section-eyebrow-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(0, 237, 100, 0.1);
+  border: 1px solid rgba(0, 237, 100, 0.25);
+  color: var(--brand-green);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 20px;
+}
+
+.dark-section-header {
+  margin-bottom: 56px;
+  max-width: 760px;
+}
+
+.dark-section-title {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-bottom: 18px;
+}
+
+.dark-section-title span {
+  color: var(--brand-green);
+}
+
+.dark-section-subtitle {
+  font-size: 18px;
+  color: var(--text-inverse-secondary);
+  line-height: 1.6;
+}
+
+/* Feature Grid in Dark Theme (MongoDB Atlas Cards) */
+.dark-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.dark-feature-card {
+  background-color: var(--bg-dark-surface);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-normal);
+}
+
+.dark-feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--brand-green), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.dark-feature-card:hover {
+  border-color: rgba(0, 237, 100, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+.dark-feature-card:hover::before {
+  opacity: 1;
+}
+
+.dark-card-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 237, 100, 0.12);
+  border: 1px solid rgba(0, 237, 100, 0.25);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-green);
+  font-size: 20px;
+  margin-bottom: 24px;
+}
+
+.dark-feature-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.dark-feature-card p {
+  font-size: 14.5px;
+  color: var(--text-inverse-secondary);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.card-code-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--brand-green);
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(0, 237, 100, 0.15);
+}
+
+/* ==========================================================================
+   Light Section: Developer Specs & Code (MongoDB "Tech Stack")
+   ========================================================================== */
+.specs-section {
+  padding: 100px 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.specs-content-col h2 {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+
+.specs-content-col h2 span {
+  color: var(--brand-forest);
+}
+
+.specs-content-col p {
+  font-size: 17px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.specs-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.specs-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.check-icon {
+  width: 24px;
+  height: 24px;
+  background: rgba(0, 104, 74, 0.1);
+  color: var(--brand-forest);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.check-text strong {
+  display: block;
+  font-size: 15px;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.check-text span {
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+/* Code Snippet Box (MongoDB Style) */
+.code-box-wrapper {
+  background: var(--bg-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.code-box-tabs {
+  background: #021a24;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.code-tabs-list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.code-tab {
+  background: transparent;
+  border: none;
+  padding: 12px 16px;
+  color: var(--text-inverse-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.code-tab.active {
+  color: var(--brand-green);
+  border-bottom-color: var(--brand-green);
+  background: rgba(0, 237, 100, 0.05);
+}
+
+.btn-copy-code {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-inverse-secondary);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy-code:hover {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.code-snippet-pane {
+  display: none;
+  padding: 24px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #e6edf3;
+  line-height: 1.6;
+  overflow-x: auto;
+  max-height: 420px;
+}
+
+.code-snippet-pane.active {
+  display: block;
+}
+
+/* Syntax Highlighting */
+.syn-kw { color: #ff7b72; font-weight: 600; }
+.syn-fn { color: #d2a8ff; }
+.syn-str { color: #a5d6ff; }
+.syn-comment { color: #8b949e; font-style: italic; }
+.syn-prop { color: #79c0ff; }
+.syn-num { color: #ffa657; }
+
+/* ==========================================================================
+   Installation Guide (MongoDB Quickstart)
+   ========================================================================== */
+.install-section {
+  padding: 100px 32px;
+  background-color: var(--bg-container);
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.install-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.section-center-header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 56px;
+}
+
+.section-center-header h2 {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+
+.section-center-header h2 span {
+  color: var(--brand-forest);
+}
+
+.section-center-header p {
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+.install-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  margin-bottom: 48px;
+}
+
+.install-step-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all var(--transition-normal);
+}
+
+.install-step-card:hover {
+  border-color: var(--brand-forest);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.step-badge {
+  width: 36px;
+  height: 36px;
+  background: var(--brand-forest);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.install-step-card h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.install-step-card p {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.install-step-card code {
+  background: var(--bg-container);
+  border: 1px solid var(--border-light);
+  padding: 2px 5px;
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  color: var(--brand-forest);
+}
+
+/* Terminal Command Box */
+.terminal-box {
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  padding: 16px 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-md);
+}
+
+.terminal-cmd {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow-x: auto;
+}
+
+.terminal-prompt {
+  color: var(--brand-green);
+  user-select: none;
+}
+
+/* ==========================================================================
+   Bug Report & Interactive Issue Generator
+   ========================================================================== */
+.bug-section {
+  padding: 100px 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.bug-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 56px;
+  align-items: flex-start;
+}
+
+.bug-info-col h2 {
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 18px;
+}
+
+.bug-info-col h2 span {
+  color: var(--brand-forest);
+}
+
+.bug-info-col p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.env-detect-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.env-detect-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.env-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.env-info-row:last-child {
+  border-bottom: none;
+}
+
+.env-label {
+  color: var(--text-muted);
+}
+
+.env-val {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--brand-forest);
+}
+
+/* Bug Report Form */
+.bug-form-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  box-shadow: var(--shadow-md);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.form-input, .form-textarea, .form-select {
+  width: 100%;
+  padding: 12px 14px;
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all var(--transition-fast);
+}
+
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--brand-forest);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 104, 74, 0.1);
+}
+
+.form-textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+/* ==========================================================================
+   Community & Contact Cards (MongoDB Style)
+   ========================================================================== */
+.community-section {
+  padding: 80px 32px;
+  background: var(--bg-container);
+  border-top: 1px solid var(--border-light);
+}
+
+.community-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.community-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+
+.community-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  text-align: center;
+  transition: all var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.community-card:hover {
+  border-color: var(--brand-forest);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.community-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-container);
+  font-size: 24px;
+  color: var(--brand-forest);
+  transition: all var(--transition-fast);
+}
+
+.community-card:hover .community-icon {
+  background: var(--brand-forest);
+  color: #ffffff;
+}
+
+.community-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.community-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-forest);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==========================================================================
+   Pre-Footer CTA Banner (MongoDB High-Voltage Green CTA)
+   ========================================================================== */
+.cta-banner-section {
+  background: linear-gradient(135deg, var(--brand-forest) 0%, var(--bg-dark) 100%);
+  color: #ffffff;
+  padding: 80px 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-banner-section::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px;
+  height: 350px;
+  background: radial-gradient(ellipse, rgba(0, 237, 100, 0.2), transparent 70%);
+  pointer-events: none;
+}
+
+.cta-banner-content {
+  max-width: 760px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-banner-title {
+  font-size: 46px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+  line-height: 1.15;
+}
+
+.cta-banner-subtitle {
+  font-size: 18px;
+  color: var(--text-inverse-secondary);
+  margin-bottom: 36px;
+  line-height: 1.6;
+}
+
+.cta-banner-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   Footer (MongoDB Enterprise Multi-Column Footer)
+   ========================================================================== */
+.site-footer {
+  background: var(--bg-dark);
+  color: var(--text-inverse-muted);
+  font-size: 14px;
+  padding: 80px 32px 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.footer-top-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 56px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-brand-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.footer-logo svg {
+  width: 24px;
+  height: 24px;
+  color: var(--brand-green);
+}
+
+.footer-tagline {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-inverse-secondary);
+  max-width: 320px;
+}
+
+.footer-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 237, 100, 0.1);
+  border: 1px solid rgba(0, 237, 100, 0.25);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-green);
+  width: fit-content;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--brand-green);
+  border-radius: 50%;
+  animation: pulseDot 2s infinite;
+}
+
+.footer-col h4 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-col a {
+  color: var(--text-inverse-secondary);
+  transition: color var(--transition-fast);
+}
+
+.footer-col a:hover {
+  color: var(--brand-green);
+}
+
+.footer-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 32px;
+  font-size: 13px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-bottom-links {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+}
+
+.footer-bottom-links a:hover {
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   Spotlight Quick Search Modal (Cmd+K)
+   ========================================================================== */
+.search-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 22, 33, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 100px;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+.search-modal-backdrop.open {
+  display: flex;
+}
+
+.search-modal-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 620px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  animation: modalScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalScaleUp {
+  from { opacity: 0; transform: scale(0.96) translateY(-10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.search-modal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.search-modal-input-row i {
+  color: var(--brand-forest);
+  font-size: 18px;
+}
+
+.search-modal-input {
+  flex: 1;
+  border: none;
+  font-size: 16px;
+  outline: none;
+  color: var(--text-primary);
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.search-results-list {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.search-result-item:hover {
+  background: var(--bg-container);
+  color: var(--brand-forest);
+}
+
+.search-modal-footer {
+  padding: 10px 20px;
+  background: var(--bg-canvas);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Toast Notification & Back to Top
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  background: var(--bg-dark);
+  color: #ffffff;
+  border: 1px solid rgba(0, 237, 100, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+  animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.toast.removing {
+  animation: toastOut 0.25s ease forwards;
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateY(12px); }
+}
+
+.toast-icon {
+  color: var(--brand-green);
+  font-size: 16px;
+}
+
+.back-to-top {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 44px;
+  height: 44px;
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  z-index: 990;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  background: var(--brand-forest);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+@media (max-width: 1200px) {
+  .hero-title { font-size: 46px; }
+  .dark-features-grid { grid-template-columns: repeat(2, 1fr); }
+  .install-steps-grid { grid-template-columns: repeat(3, 1fr); }
+  .community-grid { grid-template-columns: repeat(3, 1fr); }
+  .footer-top-grid { grid-template-columns: 2fr 1fr 1fr; gap: 36px; }
+}
+
+@media (max-width: 840px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  .specs-grid { grid-template-columns: 1fr; gap: 40px; }
+  .bug-grid { grid-template-columns: 1fr; gap: 40px; }
+  .browser-logos-grid { grid-template-columns: repeat(3, 1fr); }
+  .metrics-row { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+  .simulator-grid { grid-template-columns: 1fr; }
+  
+  .nav-menu, .nav-search-btn { display: none; }
+  .mobile-menu-toggle { display: block; }
+  
+  /* Mobile Slide Navigation Drawer */
+  .mobile-nav-drawer {
+    position: fixed;
+    top: 120px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-canvas);
+    border-top: 1px solid var(--border-light);
+    padding: 24px;
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 998;
+    overflow-y: auto;
+  }
+  
+  .mobile-nav-drawer.open {
+    display: flex;
+  }
+  
+  .mobile-nav-menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .mobile-nav-link {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title { font-size: 36px; }
+  .hero-subtitle { font-size: 16px; }
+  .dark-section-title { font-size: 32px; }
+  .dark-features-grid { grid-template-columns: 1fr; }
+  .install-steps-grid { grid-template-columns: 1fr; }
+  .community-grid { grid-template-columns: repeat(2, 1fr); }
+  .browser-logos-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-top-grid { grid-template-columns: 1fr; gap: 32px; }
+  .pencil-container { flex-direction: column; text-align: center; gap: 8px; }
+  .hero-section { padding: 36px 20px 60px; }
+  .dark-section, .specs-section, .install-section, .bug-section { padding: 60px 20px; }
+}
+
+@media (max-width: 480px) {
+  .community-grid { grid-template-columns: 1fr; }
+  .metrics-row { grid-template-columns: 1fr; }
+  .hero-cta-group { flex-direction: column; width: 100%; }
+  .hero-cta-group .btn { width: 100%; }
+}

@@ -3,854 +3,989 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kravoxin - Clipboard History Manager</title>
+  <title>Kravoxin | The Intelligent Clipboard Platform for Builders</title>
+  <meta name="description" content="Kravoxin is a lightweight, modern Chrome extension that automatically captures and organizes your clipboard history with 100% local-first privacy.">
+  <meta name="keywords" content="clipboard manager, chrome extension, developer tools, local storage, manifest v3, open source">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Kravoxin | The Intelligent Clipboard Platform for Builders">
+  <meta property="og:description" content="Automatic capture, zero-latency local search, and 100% privacy in your Chrome browser.">
+  <meta property="og:image" content="assets/banner.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/icons/icon48.png">
+
+  <!-- Fonts: Plus Jakarta Sans (MongoDB Söhne style) & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-  />
-  <style>
-    :root {
-      --bg-primary: #0a0e27;
-      --bg-secondary: #0f1535;
-      --bg-tertiary: #151d3a;
-      --accent-primary: #6366f1;
-      --accent-secondary: #ec4899;
-      --accent-tertiary: #14b8a6;
-      --text-primary: #f8fafc;
-      --text-secondary: #cbd5e1;
-      --text-tertiary: #94a3b8;
-      --border-color: rgba(99, 102, 241, 0.1);
-      --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-mono: 'Space Mono', monospace;
-    }
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      font-family: var(--font-sans);
-      overflow-x: hidden;
-    }
-
-    /* Starfield Background */
-    .starfield {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    .star {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: white;
-      border-radius: 50%;
-      animation: twinkle 3s infinite;
-    }
-
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
-    }
-
-    /* Gradient Orbs */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(60px);
-      opacity: 0.15;
-      z-index: -1;
-    }
-
-    .orb-1 {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, var(--accent-primary), transparent);
-      top: -100px;
-      left: -100px;
-      animation: float 20s ease-in-out infinite;
-    }
-
-    .orb-2 {
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, var(--accent-secondary), transparent);
-      top: 50%;
-      right: -50px;
-      animation: float 25s ease-in-out infinite reverse;
-    }
-
-    .orb-3 {
-      width: 350px;
-      height: 350px;
-      background: radial-gradient(circle, var(--accent-tertiary), transparent);
-      bottom: -100px;
-      left: 30%;
-      animation: float 30s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) translateX(0px); }
-      50% { transform: translateY(40px) translateX(20px); }
-    }
-
-    /* Navigation */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(10, 14, 39, 0.7);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-color);
-      padding: 1rem 2rem;
-    }
-
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .nav-logo svg {
-      width: 32px;
-      height: 32px;
-      color: var(--accent-primary);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.95rem;
-      font-weight: 500;
-      position: relative;
-      transition: color 0.3s ease;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active {
-      color: var(--accent-primary);
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-      transition: width 0.3s ease;
-    }
-
-    .nav-links a:hover::after,
-    .nav-links a.active::after {
-      width: 100%;
-    }
-
-    @media (max-width: 768px) {
-      .nav-links {
-        display: none;
-      }
-    }
-
-    /* Hero Section */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      position: relative;
-    }
-
-    .hero-content {
-      text-align: center;
-      max-width: 800px;
-      animation: fadeInUp 1s ease-out;
-    }
-
-    .hero h1 {
-      font-size: 4rem;
-      line-height: 1.2;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero p {
-      font-size: 1.25rem;
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-
-    .hero-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 1rem 2rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: var(--font-sans);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      color: white;
-      border: 2px solid transparent;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--accent-primary);
-      border: 2px solid var(--accent-primary);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(99, 102, 241, 0.1);
-      transform: translateY(-2px);
-    }
-
-    /* Sections */
-    section {
-      padding: 6rem 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section-title {
-      font-size: 2.5rem;
-      margin-bottom: 3rem;
-      text-align: center;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* Features Grid */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-    }
-
-    .feature-card {
-      background: rgba(15, 21, 53, 0.5);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 2rem;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .feature-card:hover {
-      border-color: var(--accent-primary);
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.1);
-    }
-
-    .feature-card:hover::before {
-      opacity: 1;
-    }
-
-    .feature-icon {
-      width: 48px;
-      height: 48px;
-      background: rgba(99, 102, 241, 0.1);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1rem;
-      font-size: 1.5rem;
-    }
-
-    .feature-card h3 {
-      font-size: 1.3rem;
-      margin-bottom: 0.75rem;
-      color: var(--text-primary);
-    }
-
-    .feature-card p {
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-
-    /* Install Section */
-    .install-content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      align-items: center;
-    }
-
-    .install-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .step {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .step-number {
-      min-width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .step-content h3 {
-      margin-bottom: 0.5rem;
-      color: var(--text-primary);
-    }
-
-    .step-content p {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-    }
-
-    .install-image {
-      position: relative;
-      height: 400px;
-      background: rgba(99, 102, 241, 0.05);
-      border: 2px dashed var(--border-color);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-    }
-
-    /* Contact Section */
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .contact-card {
-      background: rgba(15, 21, 53, 0.5);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 2rem;
-      text-align: center;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-    }
-
-    .contact-card:hover {
-      border-color: var(--accent-primary);
-      transform: translateY(-5px);
-    }
-
-    .contact-icon {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    .contact-card h3 {
-      margin-bottom: 0.75rem;
-      font-size: 1.1rem;
-    }
-
-    .contact-card a {
-      color: var(--accent-primary);
-      text-decoration: none;
-      font-size: 0.95rem;
-      word-break: break-all;
-      transition: color 0.3s ease;
-    }
-
-    .contact-card a:hover {
-      color: var(--accent-secondary);
-    }
-
-    /* Bug Report Form */
-    .bug-form {
-      max-width: 600px;
-      margin: 0 auto;
-      background: rgba(15, 21, 53, 0.5);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 2.5rem;
-      backdrop-filter: blur(10px);
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: var(--text-primary);
-      font-weight: 500;
-    }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      color: var(--text-primary);
-      font-family: var(--font-sans);
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-    }
-
-    .form-group input::placeholder,
-    .form-group textarea::placeholder {
-      color: var(--text-tertiary);
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      background: rgba(99, 102, 241, 0.05);
-    }
-
-    .form-group textarea {
-      resize: vertical;
-      min-height: 120px;
-    }
-
-    /* Footer */
-    footer {
-      background: rgba(10, 14, 39, 0.7);
-      border-top: 1px solid var(--border-color);
-      padding: 2rem;
-      text-align: center;
-      color: var(--text-tertiary);
-    }
-
-    /* Animations */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .fade-in-on-scroll {
-      opacity: 0;
-      animation: fadeInUp 0.6s ease-out forwards;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero h1 {
-        font-size: 2.5rem;
-      }
-
-      .hero p {
-        font-size: 1rem;
-      }
-
-      .install-content {
-        grid-template-columns: 1fr;
-      }
-
-      .install-image {
-        height: 250px;
-      }
-
-      .section-title {
-        font-size: 1.8rem;
-      }
-
-      section {
-        padding: 3rem 1rem;
-      }
-    }
-  </style>
+  <!-- MongoDB-inspired Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Starfield Background -->
-  <div class="starfield" id="starfield"></div>
-  
-  <!-- Gradient Orbs -->
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
 
-  <!-- Navigation -->
-  <nav>
+  <!-- ==========================================================================
+       Pencil Announcement Banner (MongoDB Style)
+       ========================================================================== -->
+  <aside class="pencil-banner" aria-label="Announcements">
+    <div class="pencil-container">
+      <div class="pencil-slider">
+        <!-- Slide 1 -->
+        <div class="pencil-item active" id="pencil-slide-1">
+          <span class="pencil-pill">Announcement</span>
+          <span class="pencil-text">
+            Kravoxin v1.4.0 is live: Instant search, favorite pinning &amp; local-first storage.
+            <a href="#features" class="pencil-link">Explore features <i class="fa-solid fa-arrow-right"></i></a>
+          </span>
+        </div>
+        <!-- Slide 2 -->
+        <div class="pencil-item" id="pencil-slide-2">
+          <span class="pencil-pill">Security</span>
+          <span class="pencil-text">
+            100% Client-Side Privacy: 0 bytes sent to external cloud servers.
+            <a href="#specs" class="pencil-link">View architecture <i class="fa-solid fa-arrow-right"></i></a>
+          </span>
+        </div>
+        <!-- Slide 3 -->
+        <div class="pencil-item" id="pencil-slide-3">
+          <span class="pencil-pill">Open Source</span>
+          <span class="pencil-text">
+            Manifest V3 compliant with ultra-low memory footprint.
+            <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer" class="pencil-link">Star on GitHub <i class="fa-solid fa-star"></i></a>
+          </span>
+        </div>
+      </div>
+
+      <div class="pencil-controls">
+        <button class="pencil-btn" id="pencil-prev" title="Previous Announcement" aria-label="Previous announcement">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button class="pencil-btn" id="pencil-next" title="Next Announcement" aria-label="Next announcement">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==========================================================================
+       Navigation Bar (MongoDB Style)
+       ========================================================================== -->
+  <header class="site-nav" id="top">
     <div class="nav-container">
-      <div class="nav-logo">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M19 3H14.82C14.4 1.84 13.3 1 12 1C10.7 1 9.6 1.84 9.18 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM12 3C12.55 3 13 3.45 13 4C13 4.55 12.55 5 12 5C11.45 5 11 4.55 11 4C11 3.45 11.45 3 12 3ZM19 19H5V5H7V7H17V5H19V19Z" fill="currentColor"/>
-        </svg>
-        Kravoxin
-      </div>
-      <ul class="nav-links">
-        <li><a href="#home" class="nav-link active">Home</a></li>
-        <li><a href="#features" class="nav-link">Features</a></li>
-        <li><a href="#install" class="nav-link">Install</a></li>
-        <li><a href="#contact" class="nav-link">Contact</a></li>
-        <li><a href="#bug" class="nav-link">Report Bug</a></li>
-      </ul>
-    </div>
-  </nav>
-
-  <!-- Hero Section -->
-  <section class="hero" id="home">
-    <div class="hero-content">
-      <h1>Kravoxin</h1>
-      <p>A lightweight Chrome extension that captures and organizes your clipboard history. Never lose a copied snippet again.</p>
-      <div class="hero-buttons">
-        <a href="#install" class="btn btn-primary">Get Started</a>
-        <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" class="btn btn-secondary">View on GitHub</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features Section -->
-  <section id="features">
-    <h2 class="section-title">Features</h2>
-    <div class="features-grid">
-      <div class="feature-card fade-in-on-scroll">
-        <div class="feature-icon">
-          <i class="fa-regular fa-clipboard" style="color: rgb(255, 255, 255);"></i>
-        </div>
-        <h3>Auto Capture</h3>
-        <p>Every text you copy on a webpage is automatically saved to your history with zero effort required.</p>
-      </div>
-
-      <div class="feature-card fade-in-on-scroll">
-        <div class="feature-icon"><i class="fa-solid fa-floppy-disk" style="color: rgb(255, 255, 255);"></i></div>
-        <h3>Local Storage</h3>
-        <p>All your clipboard history is stored securely on your device in chrome.storage.local. No cloud sync, complete privacy.</p>
-      </div>
-
-      <div class="feature-card fade-in-on-scroll">
-        <div class="feature-icon"><i class="fa-solid fa-bolt" style="color: rgb(255, 255, 255);"></i></div>
-        <h3>Lightning Fast</h3>
-        <p>Minimal footprint. Instant access to your clipboard history through the clean, intuitive popup interface.</p>
-      </div>
-
-      <div class="feature-card fade-in-on-scroll">
-        <div class="feature-icon"><i class="fa-solid fa-heart-circle-plus" style="color: rgb(255, 255, 255);"></i></div>
-        <h3>Favorite Items</h3>
-        <p>Mark important snippets as favorites to keep them safe from bulk deletions.</p>
-      </div>
-
-      <div class="feature-card fade-in-on-scroll">
-        <div class="feature-icon"><i class="fa-solid fa-trash-can" style="color: rgb(255, 255, 255);"></i></div>
-        <h3>Easy Deletion</h3>
-        <p>Remove unwanted items instantly or clear all non-favorite entries with one click.</p>
-      </div>
-
-      <div class="feature-card fade-in-on-scroll">
-        <div class="feature-icon"><i class="fa-solid fa-palette" style="color: rgb(255, 255, 255);"></i></div>
-        <h3>Modern Design</h3>
-        <p>Beautiful dark theme with glassmorphism effects. A pleasure to look at and use.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Install Section -->
-  <section id="install">
-    <h2 class="section-title">Installation</h2>
-    <div class="install-content">
-      <div class="install-steps">
-        <div class="step">
-          <div class="step-number">1</div>
-          <div class="step-content">
-            <h3>Download</h3>
-            <p>Clone or download the Kravoxin repository from GitHub.</p>
+      <div class="nav-brand-group">
+        <a href="#top" class="brand-logo" aria-label="Kravoxin Home">
+          <div class="brand-icon">
+            <!-- Kravoxin Icon from assets -->
+            <img src="assets/icons/icon48.png" alt="Kravoxin Logo" width="32" height="32" style="border-radius: 8px;">
           </div>
-        </div>
-
-        <div class="step">
-          <div class="step-number">2</div>
-          <div class="step-content">
-            <h3>Open Extensions</h3>
-            <p>Navigate to <code>chrome://extensions/</code> in your Chrome browser.</p>
+          <div class="brand-text">
+            Kravoxin
+            <span class="brand-version">v1.4</span>
           </div>
-        </div>
-
-        <div class="step">
-          <div class="step-number">3</div>
-          <div class="step-content">
-            <h3>Enable Developer Mode</h3>
-            <p>Toggle the Developer mode switch in the top-right corner of the extensions page.</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-number">4</div>
-          <div class="step-content">
-            <h3>Load Unpacked</h3>
-            <p>Click "Load unpacked" and select the Kravoxin folder from your computer.</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-number">5</div>
-          <div class="step-content">
-            <h3>Start Using</h3>
-            <p>Copy text anywhere on the web. Click the Kravoxin icon to view your clipboard history!</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="install-image">
-        <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" class="btn btn-secondary">
-          View on GitHub
-          <i class="fa-brands fa-github" style="color: #6366f1;"></i>
         </a>
+
+        <nav class="nav-menu-wrapper" aria-label="Primary Navigation">
+          <ul class="nav-menu">
+            <li><a href="#features" class="nav-link">Features</a></li>
+            <li><a href="#specs" class="nav-link">Architecture</a></li>
+            <li><a href="#install" class="nav-link">Quickstart</a></li>
+            <li><a href="#bug" class="nav-link">Bug Report</a></li>
+            <li><a href="#community" class="nav-link">Community</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Quick Search Modal Trigger -->
+        <button class="nav-search-btn open-search-modal" title="Quick Search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>Search documentation...</span>
+          <span class="kbd-shortcut">Ctrl K</span>
+        </button>
+
+        <!-- GitHub Stars Badge -->
+        <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer" class="btn-github-stars" title="View repository on GitHub">
+          <i class="fa-brands fa-github"></i>
+          <span>Star</span>
+          <span class="star-count">★ 142</span>
+        </a>
+
+        <!-- MongoDB Signature Green Primary CTA -->
+        <a href="#install" class="btn btn-primary">
+          <i class="fa-brands fa-chrome"></i>
+          <span>Add to Chrome</span>
+        </a>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle navigation menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
       </div>
     </div>
-  </section>
+  </header>
 
-  <!-- Contact Section -->
-  <section id="contact">
-    <h2 class="section-title">Get in Touch</h2>
-    <div class="contact-grid">
-      <div class="contact-card fade-in-on-scroll">
-          <div class="contact-icon">
-            <img src="https://skillicons.dev/icons?i=github" />
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-nav-drawer" id="mobile-nav-drawer">
+    <ul class="mobile-nav-menu">
+      <li><a href="#features" class="mobile-nav-link">Features</a></li>
+      <li><a href="#specs" class="mobile-nav-link">Architecture &amp; Tech Stack</a></li>
+      <li><a href="#install" class="mobile-nav-link">Installation Guide</a></li>
+      <li><a href="#bug" class="mobile-nav-link">Report a Bug</a></li>
+      <li><a href="#community" class="mobile-nav-link">Developer Community</a></li>
+    </ul>
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px; align-items: stretch;">
+      <a href="#install" class="btn btn-primary" style="width: 100%; justify-content: center; box-sizing: border-box;">
+        <i class="fa-brands fa-chrome"></i> Add to Chrome — It's Free
+      </a>
+      <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" class="btn btn-secondary" style="width: 100%; justify-content: center; box-sizing: border-box;">
+        <i class="fa-brands fa-github"></i> View GitHub Source
+      </a>
+    </div>
+  </div>
+
+  <main>
+    <!-- ==========================================================================
+         Hero Section (MongoDB Inspired)
+         ========================================================================== -->
+    <section class="hero-section" id="home">
+      <div class="hero-grid">
+        <!-- Hero Left Column: Headline & Action -->
+        <div class="hero-content-col">
+          <div class="hero-eyebrow">
+            <span class="eyebrow-dot"></span>
+            THE INTELLIGENT CLIPBOARD PLATFORM FOR BUILDERS
+          </div>
+
+          <h1 class="hero-title">
+            Every snippet.<br>
+            Any workflow.<br>
+            <span class="hero-title-highlight">One intelligent platform.</span>
+          </h1>
+
+          <p class="hero-subtitle">
+            Combine real-time clipboard stream capture, sub-millisecond local search, and guaranteed 100% data privacy in an ultra-lightweight Chrome extension. Built for developers, creators, and power users.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="#install" class="btn btn-primary btn-lg">
+              <span>Add to Chrome — Free</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+            <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-lg">
+              <i class="fa-brands fa-github"></i>
+              <span>Explore GitHub</span>
+            </a>
+          </div>
+
+          <ul class="hero-trust-list">
+            <li><i class="fa-solid fa-circle-check"></i> 100% Local Storage</li>
+            <li><i class="fa-solid fa-circle-check"></i> Manifest V3 Ready</li>
+            <li><i class="fa-solid fa-circle-check"></i> Zero Cloud Tracking</li>
+          </ul>
         </div>
-        <h3>GitHub</h3>
-        <a href="https://github.com/Rohan-Shridhar" target="_blank">Collaborate</a>
+
+        <!-- Hero Right Column: Interactive Developer Simulator -->
+        <div class="hero-demo-wrapper">
+          <div class="demo-header-bar">
+            <div class="window-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+
+            <div class="demo-tabs-nav" role="tablist">
+              <button class="demo-tab-btn active" data-tab="pane-simulator" role="tab" aria-selected="true">
+                <i class="fa-regular fa-window-restore"></i> Virtual Extension
+              </button>
+              <button class="demo-tab-btn" data-tab="pane-storage" role="tab" aria-selected="false">
+                <i class="fa-solid fa-database"></i> Storage JSON
+              </button>
+              <button class="demo-tab-btn" data-tab="pane-arch" role="tab" aria-selected="false">
+                <i class="fa-solid fa-network-wired"></i> Architecture
+              </button>
+            </div>
+
+            <div class="demo-live-badge">
+              <span class="pulse"></span> LIVE
+            </div>
+          </div>
+
+          <!-- Tab 1: Virtual Extension Simulator Pane -->
+          <div class="demo-content-pane active" id="pane-simulator">
+            <div class="simulator-grid">
+              <!-- Web Page Simulator (Click to Copy) -->
+              <div class="web-sample-box">
+                <div class="sample-box-title">
+                  <i class="fa-solid fa-globe" style="color: var(--brand-forest);"></i>
+                  <span>Webpage Copy Trigger</span>
+                </div>
+                <p class="sample-box-desc">
+                  Click any sample code snippet below to simulate copying. Watch Kravoxin's live popup capture it instantly!
+                </p>
+
+                <div class="sample-snippet-card" data-snippet="git clone https://github.com/Rohan-Shridhar/Kravoxin.git" title="Click to copy into Kravoxin">
+                  <span class="snippet-text-content">git clone https://github.com/Rohan-Shridhar/Kravoxin.git</span>
+                  <span class="snippet-copy-action"><i class="fa-regular fa-copy"></i> Copy</span>
+                </div>
+
+                <div class="sample-snippet-card" data-snippet="npm install kravoxin-extension --save" title="Click to copy into Kravoxin">
+                  <span class="snippet-text-content">npm install kravoxin-extension --save</span>
+                  <span class="snippet-copy-action"><i class="fa-regular fa-copy"></i> Copy</span>
+                </div>
+
+                <div class="sample-snippet-card" data-snippet="mongodb+srv://admin:cluster@kravoxin.db.net/prod" title="Click to copy into Kravoxin">
+                  <span class="snippet-text-content">mongodb+srv://admin:cluster@kravoxin.db.net...</span>
+                  <span class="snippet-copy-action"><i class="fa-regular fa-copy"></i> Copy</span>
+                </div>
+
+                <!-- Custom copy input -->
+                <div class="custom-copy-input-row">
+                  <input type="text" id="custom-copy-input" class="custom-copy-input" placeholder="Type custom snippet &amp; press Enter...">
+                  <button id="custom-copy-btn" class="custom-copy-btn" title="Simulate Copy">Copy</button>
+                </div>
+              </div>
+
+              <!-- Virtual Kravoxin Extension Popup -->
+              <div class="virtual-popup">
+                <div class="v-popup-header">
+                  <div class="v-popup-brand">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M19 3H14.82C14.4 1.84 13.3 1 12 1C10.7 1 9.6 1.84 9.18 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM12 3C12.55 3 13 3.45 13 4C13 4.55 12.55 5 12 5C11.45 5 11 4.55 11 4C11 3.45 11.45 3 12 3ZM19 19H5V5H7V7H17V5H19V19Z" fill="currentColor"/>
+                    </svg>
+                    <span>Kravoxin</span>
+                  </div>
+                  <div class="v-popup-actions">
+                    <button id="v-clear-all-btn" class="v-btn-clear" title="Clear all non-favorites">
+                      <i class="fa-solid fa-broom"></i>
+                      <span>Clear All</span>
+                    </button>
+                    <span class="v-badge-author">By Rohan</span>
+                  </div>
+                </div>
+
+                <!-- Virtual Search Input -->
+                <div class="v-search-bar">
+                  <i class="fa-solid fa-magnifying-glass" style="font-size: 11px; color: var(--text-muted);"></i>
+                  <input type="text" id="v-search-input" class="v-search-input" placeholder="Instant filter snippets...">
+                </div>
+
+                <!-- Virtual History List -->
+                <div class="v-popup-list" id="v-popup-list">
+                  <!-- Populated by script.js -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Storage JSON Viewer -->
+          <div class="demo-content-pane" id="pane-storage">
+            <div class="code-viewer-container" id="v-storage-json">
+              <!-- Dynamically populated with syntax-highlighted json -->
+            </div>
+          </div>
+
+          <!-- Tab 3: Architecture Diagram Flow -->
+          <div class="demo-content-pane" id="pane-arch">
+            <div class="arch-diagram-flow">
+              <div class="arch-node">
+                <span class="arch-node-badge">1. DOM Event</span>
+                <div class="arch-node-content">
+                  <h4>Web Page User Action</h4>
+                  <p>User highlights text and presses Ctrl+C / Cmd+C on any webpage.</p>
+                </div>
+              </div>
+              <div class="arch-arrow"><i class="fa-solid fa-arrow-down"></i></div>
+              <div class="arch-node">
+                <span class="arch-node-badge">2. content.js</span>
+                <div class="arch-node-content">
+                  <h4>Event Listener &amp; Message Dispatch</h4>
+                  <p>Content script intercepts copy event, normalizes string payload, and dispatches to background runtime.</p>
+                </div>
+              </div>
+              <div class="arch-arrow"><i class="fa-solid fa-arrow-down"></i></div>
+              <div class="arch-node">
+                <span class="arch-node-badge">3. background.js</span>
+                <div class="arch-node-content">
+                  <h4>Manifest V3 Service Worker</h4>
+                  <p>Service worker formats timestamp (yyyymmddhhmmss) and safely persists item to <code>chrome.storage.local</code>.</p>
+                </div>
+              </div>
+              <div class="arch-arrow"><i class="fa-solid fa-arrow-down"></i></div>
+              <div class="arch-node">
+                <span class="arch-node-badge">4. popup.html</span>
+                <div class="arch-node-content">
+                  <h4>Virtual DOM Reactive Interface</h4>
+                  <p>Popup reads normalized state, handles favorite status, instant search, and one-click re-copying.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Trust & Ecosystem Section (MongoDB Logo & Metrics Strip)
+         ========================================================================== -->
+    <section class="ecosystem-section" aria-label="Supported Browser Ecosystem">
+      <div class="ecosystem-container">
+        <h2 class="ecosystem-title">Engineered for Modern Browsers &amp; Power Workflows</h2>
+
+        <div class="browser-logos-grid">
+          <div class="browser-card">
+            <i class="fa-brands fa-chrome" style="color: #4285f4;"></i>
+            <span>Google Chrome</span>
+          </div>
+          <div class="browser-card">
+            <i class="fa-brands fa-edge" style="color: #0078d7;"></i>
+            <span>Microsoft Edge</span>
+          </div>
+          <div class="browser-card">
+            <i class="fa-brands fa-brave" style="color: #fb542b;"></i>
+            <span>Brave Browser</span>
+          </div>
+          <div class="browser-card">
+            <i class="fa-solid fa-compass" style="color: #ff3366;"></i>
+            <span>Arc Browser</span>
+          </div>
+          <div class="browser-card">
+            <i class="fa-brands fa-opera" style="color: #ff1b2d;"></i>
+            <span>Opera</span>
+          </div>
+          <div class="browser-card">
+            <i class="fa-brands fa-github" style="color: #24292e;"></i>
+            <span>Chromium Core</span>
+          </div>
+        </div>
+
+        <!-- 4 Key Metrics -->
+        <div class="metrics-row reveal-on-scroll">
+          <div class="metric-item">
+            <div class="metric-val">100%</div>
+            <div class="metric-label">Local-First Storage (Zero Cloud)</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-val">&lt; 2ms</div>
+            <div class="metric-label">Sub-Millisecond Search Query</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-val">0 KB</div>
+            <div class="metric-label">Zero Telemetry or Data Leaks</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-val">v1.4.0</div>
+            <div class="metric-label">Production Manifest V3 Standard</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Dark Section: Core Capabilities (MongoDB Atlas Midnight Slate Theme)
+         ========================================================================== -->
+    <section class="dark-section" id="features">
+      <div class="dark-container">
+        <div class="dark-section-header reveal-on-scroll">
+          <div class="section-eyebrow-dark">
+            <i class="fa-solid fa-cubes"></i> CORE CAPABILITIES
+          </div>
+          <h2 class="dark-section-title">
+            Built for speed. <span>Engineered for privacy.</span>
+          </h2>
+          <p class="dark-section-subtitle">
+            Explore the core architectural features that make Kravoxin the fastest, most dependable local clipboard manager in the Chrome ecosystem.
+          </p>
+        </div>
+
+        <div class="dark-features-grid">
+          <!-- Card 1 -->
+          <div class="dark-feature-card reveal-on-scroll">
+            <div class="dark-card-icon">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h3>Automatic Stream Capture</h3>
+            <p>
+              Silently and passively listens for copied text across any active webpage. Captures rich text, code snippets, URLs, and tokens without adding input latency or interfering with page scripts.
+            </p>
+            <div>
+              <span class="card-code-pill"><i class="fa-solid fa-code"></i> content.js listener</span>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="dark-feature-card reveal-on-scroll">
+            <div class="dark-card-icon">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3>Zero-Cloud Local Vault</h3>
+            <p>
+              Your clipboard history belongs exclusively to you. All entries and timestamps reside inside <code>chrome.storage.local</code>. No analytics, no third-party APIs, and no telemetry tracking.
+            </p>
+            <div>
+              <span class="card-code-pill"><i class="fa-solid fa-lock"></i> 100% Client-Side</span>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="dark-feature-card reveal-on-scroll">
+            <div class="dark-card-icon">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <h3>Sub-Millisecond Search</h3>
+            <p>
+              Filter through hundreds of previously copied snippets in real-time. Instant client-side substring matching lets you find long commands, JSON strings, or links with zero lag.
+            </p>
+            <div>
+              <span class="card-code-pill"><i class="fa-solid fa-bolt"></i> Instant Fuzzy Filter</span>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="dark-feature-card reveal-on-scroll">
+            <div class="dark-card-icon">
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <h3>Favorite &amp; Retention Shield</h3>
+            <p>
+              Star important snippets such as API tokens, bash one-liners, and documentation links. Favorited items are shielded from bulk "Clear All" deletions and always prioritized.
+            </p>
+            <div>
+              <span class="card-code-pill"><i class="fa-solid fa-shield-heart"></i> Pin Protection</span>
+            </div>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="dark-feature-card reveal-on-scroll">
+            <div class="dark-card-icon">
+              <i class="fa-solid fa-copy"></i>
+            </div>
+            <h3>One-Click Re-Copy Engine</h3>
+            <p>
+              Write any historical snippet straight back to your system clipboard with a single click. Includes immediate visual confirmation toasts and timestamp refresh mechanisms.
+            </p>
+            <div>
+              <span class="card-code-pill"><i class="fa-solid fa-paperclip"></i> navigator.clipboard</span>
+            </div>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="dark-feature-card reveal-on-scroll">
+            <div class="dark-card-icon">
+              <i class="fa-solid fa-microchip"></i>
+            </div>
+            <h3>Ultra-Lightweight Footprint</h3>
+            <p>
+              Built without bulky UI frameworks or heavy external libraries. Pure vanilla JavaScript, clean CSS, and optimized Manifest V3 service workers for instant popup load times.
+            </p>
+            <div>
+              <span class="card-code-pill"><i class="fa-solid fa-gauge-high"></i> &lt; 25KB Runtime</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Light Section: Architecture & Code Specs (MongoDB "Tech Stack")
+         ========================================================================== -->
+    <section class="specs-section" id="specs">
+      <div class="specs-grid">
+        <!-- Specs Content Left -->
+        <div class="specs-content-col reveal-on-scroll">
+          <div class="hero-eyebrow">
+            <i class="fa-solid fa-layer-group"></i> UNDER THE HOOD
+          </div>
+          <h2>
+            Works seamlessly with <span>your tech stack.</span>
+          </h2>
+          <p>
+            Kravoxin follows strict Manifest V3 architecture guidelines. It leverages asynchronous storage promises, normalized data shapes, and passive event interception to ensure zero browser overhead.
+          </p>
+
+          <ul class="specs-checklist">
+            <li>
+              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+              <div class="check-text">
+                <strong>Event-Driven Background Service Worker</strong>
+                <span>Runs only when copy events occur, terminating automatically to preserve CPU cycles and battery life.</span>
+              </div>
+            </li>
+            <li>
+              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+              <div class="check-text">
+                <strong>Normalized Schema with Precise Timestamps</strong>
+                <span>Items are tracked with <code>yyyymmddhhmmss</code> formats, duplicate resilience, and explicit favorite flags.</span>
+              </div>
+            </li>
+            <li>
+              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+              <div class="check-text">
+                <strong>Minimalist Permission Footprint</strong>
+                <span>Requires strictly <code>storage</code> and <code>clipboardWrite</code>. Zero access to browsing history or personal tabs.</span>
+              </div>
+            </li>
+          </ul>
+
+          <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer" class="btn btn-forest">
+            <i class="fa-brands fa-github"></i>
+            <span>Browse Full Repository</span>
+          </a>
+        </div>
+
+        <!-- Code Box Right (MongoDB Style Tabs) -->
+        <div class="code-box-wrapper reveal-on-scroll">
+          <div class="code-box-tabs">
+            <div class="code-tabs-list">
+              <button class="code-tab active" data-pane="code-storage">storage.js</button>
+              <button class="code-tab" data-pane="code-bg">background.js</button>
+              <button class="code-tab" data-pane="code-content">content.js</button>
+            </div>
+            <button class="btn-copy-code" id="btn-copy-spec-code" title="Copy code">
+              <i class="fa-regular fa-copy"></i> Copy Code
+            </button>
+          </div>
+
+          <!-- Code Snippet 1: storage.js -->
+          <div class="code-snippet-pane active" id="code-storage">
+<pre><code><span class="syn-comment">// Kravoxin Storage Helper Engine</span>
+<span class="syn-kw">async function</span> <span class="syn-fn">addHistoryItem</span>(<span class="syn-prop">text</span>, <span class="syn-prop">timestamp</span> = <span class="syn-fn">formatCopyTimestamp</span>()) {
+  <span class="syn-kw">const</span> history = <span class="syn-kw">await</span> <span class="syn-fn">getHistory</span>();
+  
+  <span class="syn-comment">// Newest items prepend to the front</span>
+  history.<span class="syn-fn">unshift</span>({
+    text,
+    favorite: <span class="syn-kw">false</span>,
+    timestamp
+  });
+
+  <span class="syn-kw">await</span> <span class="syn-fn">saveHistory</span>(history);
+}
+
+<span class="syn-comment">// Protected bulk clear preserving starred items</span>
+<span class="syn-kw">async function</span> <span class="syn-fn">clearAllHistory</span>() {
+  <span class="syn-kw">const</span> history = <span class="syn-kw">await</span> <span class="syn-fn">getHistory</span>();
+  <span class="syn-kw">const</span> favoritesOnly = history.<span class="syn-fn">filter</span>((<span class="syn-prop">item</span>) =&gt; item.favorite);
+  <span class="syn-kw">await</span> <span class="syn-fn">saveHistory</span>(favoritesOnly);
+}</code></pre>
+          </div>
+
+          <!-- Code Snippet 2: background.js -->
+          <div class="code-snippet-pane" id="code-bg">
+<pre><code><span class="syn-comment">// Manifest V3 Background Service Worker</span>
+importScripts(<span class="syn-str">'storage.js'</span>);
+
+chrome.runtime.onMessage.<span class="syn-fn">addListener</span>((<span class="syn-prop">message</span>, <span class="syn-prop">sender</span>, <span class="syn-prop">sendResponse</span>) =&gt; {
+  <span class="syn-kw">if</span> (message.type === <span class="syn-str">'TEXT_COPIED'</span> &amp;&amp; message.payload) {
+    <span class="syn-fn">addHistoryItem</span>(message.payload)
+      .<span class="syn-fn">then</span>(() =&gt; <span class="syn-fn">sendResponse</span>({ success: <span class="syn-kw">true</span> }))
+      .<span class="syn-fn">catch</span>((<span class="syn-prop">err</span>) =&gt; <span class="syn-fn">sendResponse</span>({ success: <span class="syn-kw">false</span>, error: err }));
+    <span class="syn-kw">return true</span>; <span class="syn-comment">// Keep channel open for async response</span>
+  }
+});</code></pre>
+          </div>
+
+          <!-- Code Snippet 3: content.js -->
+          <div class="code-snippet-pane" id="code-content">
+<pre><code><span class="syn-comment">// Passive DOM Clipboard Observer</span>
+document.<span class="syn-fn">addEventListener</span>(<span class="syn-str">'copy'</span>, () =&gt; {
+  <span class="syn-comment">// Read selection from active document</span>
+  <span class="syn-kw">const</span> selectedText = window.<span class="syn-fn">getSelection</span>()?.<span class="syn-fn">toString</span>()?.<span class="syn-fn">trim</span>();
+  
+  <span class="syn-kw">if</span> (selectedText &amp;&amp; selectedText.length &gt; <span class="syn-num">0</span>) {
+    chrome.runtime.<span class="syn-fn">sendMessage</span>({
+      type: <span class="syn-str">'TEXT_COPIED'</span>,
+      payload: selectedText
+    });
+  }
+});</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Installation Guide (MongoDB Quickstart Style)
+         ========================================================================== -->
+    <section class="install-section" id="install">
+      <div class="install-container">
+        <div class="section-center-header reveal-on-scroll">
+          <div class="hero-eyebrow">
+            <i class="fa-solid fa-rocket"></i> QUICKSTART GUIDE
+          </div>
+          <h2>
+            Get up and running in <span>under 60 seconds.</span>
+          </h2>
+          <p>
+            No complex setup or account registration required. Load Kravoxin directly into Chrome as an unpacked developer extension.
+          </p>
+        </div>
+
+        <div class="install-steps-grid">
+          <!-- Step 1 -->
+          <div class="install-step-card reveal-on-scroll">
+            <div class="step-badge">01</div>
+            <h3>Clone or Download</h3>
+            <p>Clone the repository from GitHub or download the source code archive to your local drive.</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="install-step-card reveal-on-scroll">
+            <div class="step-badge">02</div>
+            <h3>Open Extensions</h3>
+            <p>Navigate to <code>chrome://extensions/</code> in your Google Chrome or Chromium browser.</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="install-step-card reveal-on-scroll">
+            <div class="step-badge">03</div>
+            <h3>Developer Mode</h3>
+            <p>Toggle on the <strong>Developer mode</strong> switch in the upper right-hand corner of the page.</p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="install-step-card reveal-on-scroll">
+            <div class="step-badge">04</div>
+            <h3>Load Unpacked</h3>
+            <p>Click the <strong>Load unpacked</strong> button and select the downloaded <code>Kravoxin</code> root folder.</p>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="install-step-card reveal-on-scroll">
+            <div class="step-badge">05</div>
+            <h3>Pin &amp; Enjoy</h3>
+            <p>Pin the Kravoxin extension icon to your toolbar. Copy any text online and watch it save automatically!</p>
+          </div>
+        </div>
+
+        <!-- Terminal Command Box -->
+        <div class="terminal-box reveal-on-scroll">
+          <div class="terminal-cmd">
+            <span class="terminal-prompt">$</span>
+            <span id="terminal-text">git clone https://github.com/Rohan-Shridhar/Kravoxin.git</span>
+          </div>
+          <button class="btn btn-sm btn-dark-secondary" id="copy-terminal-cmd" title="Copy Command">
+            <i class="fa-regular fa-copy"></i> Copy
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Bug Report & Diagnostics Section
+         ========================================================================== -->
+    <section class="bug-section" id="bug">
+      <div class="bug-grid">
+        <!-- Bug Info & Environment Diagnostics Left -->
+        <div class="bug-info-col reveal-on-scroll">
+          <div class="hero-eyebrow">
+            <i class="fa-solid fa-bug"></i> SUPPORT &amp; DIAGNOSTICS
+          </div>
+          <h2>
+            Found an issue? <span>Report directly to GitHub.</span>
+          </h2>
+          <p>
+            Help us improve Kravoxin! Fill in the quick diagnostic form to generate an issue pre-formatted with your specific browser environment data.
+          </p>
+
+          <div class="env-detect-card">
+            <div class="env-detect-title">
+              <i class="fa-solid fa-laptop-code" style="color: var(--brand-forest);"></i>
+              <span>Auto-Detected System Environment</span>
+            </div>
+            <div class="env-info-row">
+              <span class="env-label">Browser Engine:</span>
+              <span class="env-val" id="detected-browser">Detecting...</span>
+            </div>
+            <div class="env-info-row">
+              <span class="env-label">Operating System:</span>
+              <span class="env-val" id="detected-os">Detecting...</span>
+            </div>
+            <div class="env-info-row">
+              <span class="env-label">Display Resolution:</span>
+              <span class="env-val" id="detected-resolution">Detecting...</span>
+            </div>
+            <div class="env-info-row">
+              <span class="env-label">Extension Version:</span>
+              <span class="env-val">v1.4.0 (Manifest V3)</span>
+            </div>
+          </div>
+
+          <div style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5;">
+            <i class="fa-solid fa-circle-info" style="color: var(--brand-forest); margin-right: 6px;"></i>
+            Submitting opens a new GitHub issue ticket where you can track updates and collaborate with the maintainer.
+          </div>
+        </div>
+
+        <!-- Bug Report Form Right -->
+        <div class="bug-form-card reveal-on-scroll">
+          <form id="bug-report-form">
+            <div class="form-group">
+              <label for="bug-title-input" class="form-label">Issue Title *</label>
+              <input type="text" id="bug-title-input" class="form-input" placeholder="e.g., Clipboard items fail to copy on specific domains" required>
+            </div>
+
+            <div class="form-group">
+              <label for="bug-category-select" class="form-label">Category *</label>
+              <select id="bug-category-select" class="form-select">
+                <option value="Bug">Bug Report (Unexpected Behavior)</option>
+                <option value="Performance">Performance / Latency</option>
+                <option value="UI/UX">UI / Display Glitch</option>
+                <option value="Feature Request">Feature Request / Enhancement</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="bug-desc-input" class="form-label">Description &amp; Steps to Reproduce *</label>
+              <textarea id="bug-desc-input" class="form-textarea" placeholder="Describe what happened, what you expected, and any reproduction steps..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="bug-browser-field" class="form-label">Environment Information (Auto-Filled)</label>
+              <input type="text" id="bug-browser-field" class="form-input" readonly>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px;">
+              <i class="fa-brands fa-github"></i>
+              <span>Open Pre-filled GitHub Issue</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Community & Get in Touch (MongoDB Resource Cards)
+         ========================================================================== -->
+    <section class="community-section" id="community">
+      <div class="community-container">
+        <div class="section-center-header reveal-on-scroll">
+          <div class="hero-eyebrow">
+            <i class="fa-solid fa-users"></i> COMMUNITY &amp; COLLABORATION
+          </div>
+          <h2>
+            Connect with the <span>Creator &amp; Community.</span>
+          </h2>
+          <p>
+            Kravoxin is developed and maintained by Rohan Mirjankar. Join our community, submit feedback, or explore developer resources.
+          </p>
+        </div>
+
+        <div class="community-grid">
+          <!-- Card 1: GitHub -->
+          <a href="https://github.com/Rohan-Shridhar" target="_blank" rel="noopener noreferrer" class="community-card reveal-on-scroll">
+            <div class="community-icon">
+              <i class="fa-brands fa-github"></i>
+            </div>
+            <h3>GitHub</h3>
+            <span class="community-link">Collaborate <i class="fa-solid fa-arrow-right"></i></span>
+          </a>
+
+          <!-- Card 2: LinkedIn -->
+          <a href="https://www.linkedin.com/in/rohan-mirjankar/" target="_blank" rel="noopener noreferrer" class="community-card reveal-on-scroll">
+            <div class="community-icon">
+              <i class="fa-brands fa-linkedin-in"></i>
+            </div>
+            <h3>LinkedIn</h3>
+            <span class="community-link">Connect <i class="fa-solid fa-arrow-right"></i></span>
+          </a>
+
+          <!-- Card 3: Portfolio -->
+          <a href="https://rohan-mirjankar.carrd.co/" target="_blank" rel="noopener noreferrer" class="community-card reveal-on-scroll">
+            <div class="community-icon">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+            <h3>Portfolio</h3>
+            <span class="community-link">Visit Website <i class="fa-solid fa-arrow-right"></i></span>
+          </a>
+
+          <!-- Card 4: Dev.to -->
+          <a href="https://dev.to/rohan_mirjankar" target="_blank" rel="noopener noreferrer" class="community-card reveal-on-scroll">
+            <div class="community-icon">
+              <i class="fa-brands fa-dev"></i>
+            </div>
+            <h3>Dev Community</h3>
+            <span class="community-link">Read Articles <i class="fa-solid fa-arrow-right"></i></span>
+          </a>
+
+          <!-- Card 5: Email -->
+          <a href="mailto:rohansm668@gmail.com" class="community-card reveal-on-scroll">
+            <div class="community-icon">
+              <i class="fa-solid fa-envelope"></i>
+            </div>
+            <h3>Email</h3>
+            <span class="community-link">Reach Out <i class="fa-solid fa-arrow-right"></i></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Pre-Footer High-Impact CTA Banner
+         ========================================================================== -->
+    <section class="cta-banner-section" aria-label="Call to Action">
+      <div class="cta-banner-content reveal-on-scroll">
+        <h2 class="cta-banner-title">
+          Ready to supercharge your clipboard workflow?
+        </h2>
+        <p class="cta-banner-subtitle">
+          Join developers and power users who never lose a copied snippet again. Zero cloud dependencies, lightning performance, and completely free.
+        </p>
+        <div class="cta-banner-buttons">
+          <a href="#install" class="btn btn-primary btn-lg">
+            <i class="fa-brands fa-chrome"></i>
+            <span>Install Kravoxin Now</span>
+          </a>
+          <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer" class="btn btn-dark-secondary btn-lg">
+            <i class="fa-brands fa-github"></i>
+            <span>Star on GitHub</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       Footer (MongoDB Enterprise Multi-Column Footer)
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-top-grid">
+        <!-- Brand Column -->
+        <div class="footer-brand-col">
+          <div class="footer-logo">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="28" height="28" rx="8" fill="#001e2b"/>
+              <path d="M16 6C13.5 6 11.5 8 11.5 10.5V11H9C7.9 11 7 11.9 7 13V24C7 25.1 7.9 26 9 26H23C24.1 26 25 25.1 25 24V13C25 11.9 24.1 11 23 11H20.5V10.5C20.5 8 18.5 6 16 6ZM16 8C17.4 8 18.5 9.1 18.5 10.5V11H13.5V10.5C13.5 9.1 14.6 8 16 8ZM11 15H21V17H11V15ZM11 19H18V21H11V19Z" fill="#00ed64"/>
+            </svg>
+            <span>Kravoxin</span>
+          </div>
+          <p class="footer-tagline">
+            The intelligent, local-first clipboard history platform built for developers, creators, and power users.
+          </p>
+          <div class="footer-status-indicator">
+            <span class="status-dot"></span>
+            <span>All Systems Operational • Local Engine</span>
+          </div>
+        </div>
+
+        <!-- Col 2: Product -->
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#home">Virtual Simulator</a></li>
+            <li><a href="#install">Quickstart</a></li>
+            <li><a href="https://github.com/Rohan-Shridhar/Kravoxin/releases" target="_blank" rel="noopener noreferrer">Release Notes</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Developers -->
+        <div class="footer-col">
+          <h4>Developers</h4>
+          <ul>
+            <li><a href="#specs">Architecture Specs</a></li>
+            <li><a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer">Source Code</a></li>
+            <li><a href="https://developer.chrome.com/docs/extensions/mv3/intro/" target="_blank" rel="noopener noreferrer">Manifest V3 Docs</a></li>
+            <li><a href="#bug">Report a Bug</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Community -->
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="https://rohan-mirjankar.carrd.co/" target="_blank" rel="noopener noreferrer">Rohan Mirjankar</a></li>
+            <li><a href="https://github.com/Rohan-Shridhar" target="_blank" rel="noopener noreferrer">GitHub Profile</a></li>
+            <li><a href="https://www.linkedin.com/in/rohan-mirjankar/" target="_blank" rel="noopener noreferrer">LinkedIn Network</a></li>
+            <li><a href="https://dev.to/rohan_mirjankar" target="_blank" rel="noopener noreferrer">Dev.to Articles</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 5: Security & Legal -->
+        <div class="footer-col">
+          <h4>Privacy &amp; Open Source</h4>
+          <ul>
+            <li><a href="LICENSE" target="_blank">MIT License</a></li>
+            <li><a href="CONTRIBUTING.md" target="_blank">Contributing Guide</a></li>
+            <li><a href="#specs">100% Local Privacy Guarantee</a></li>
+            <li><a href="plan.md" target="_blank">Development Roadmap</a></li>
+          </ul>
+        </div>
       </div>
 
-      <div class="contact-card fade-in-on-scroll">
-        <div class="contact-icon">
-          <img src="https://skillicons.dev/icons?i=linkedin" />
+      <!-- Bottom Bar -->
+      <div class="footer-bottom-bar">
+        <div>
+          &copy; 2026 Kravoxin. Built with precision by <a href="https://rohan-mirjankar.carrd.co/" target="_blank" rel="noopener noreferrer" style="color: var(--brand-green); font-weight: 600;">Rohan Mirjankar</a>.
         </div>
-        <h3>LinkedIn</h3>
-        <a href="https://www.linkedin.com/in/rohan-mirjankar/" target="_blank">Connect</a>
-      </div>
-
-      <div class="contact-card fade-in-on-scroll">
-        <div class="contact-icon">
-          <img src="https://skillicons.dev/icons?i=instagram" />
-        </div>
-        <h3>Instagram</h3>
-        <a href="https://www.instagram.com/rohan.mirjankar/" target="_blank">Follow</a>
-      </div>
-
-      <div class="contact-card fade-in-on-scroll">
-        <div class="contact-icon">
-          <img src="https://skillicons.dev/icons?i=devto" />
-        </div>
-        <h3>Dev Community</h3>
-        <a href="https://dev.to/rohan_mirjankar" target="_blank">Explore</a>
-      </div>
-
-      <div class="contact-card fade-in-on-scroll">
-        <div class="contact-icon">
-          <img src="https://skillicons.dev/icons?i=gmail" />
-        </div>
-        <h3>Email</h3>
-        <a href="mailto:rohansm668@gmail.com">Reach out</a>
+        <ul class="footer-bottom-links">
+          <li><a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><a href="#install">Install Extension</a></li>
+          <li><a href="#top">Back to Top ↑</a></li>
+        </ul>
       </div>
     </div>
-  </section>
-
-  <!-- Bug Report Section -->
-  <section id="bug">
-    <h2 class="section-title">Report a Bug</h2>
-    <form class="bug-form" id="bug-form">
-      <div class="form-group">
-        <label for="bug-title">Bug Title</label>
-        <input type="text" id="bug-title" name="title" placeholder="Brief description of the issue" required>
-      </div>
-
-      <div class="form-group">
-        <label for="bug-description">Description</label>
-        <textarea id="bug-description" name="description" placeholder="Detailed description of the bug, steps to reproduce, and expected behavior" required></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="bug-browser">Browser Info</label>
-        <input type="text" id="bug-browser" name="browser" placeholder="e.g., Chrome 120 on Windows 11" required>
-      </div>
-
-      <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Bug Report</button>
-    </form>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2026 Kravoxin. Built with ❤️ by <a href="https://rohan-mirjankar.carrd.co/" target="_blank" style="color: var(--accent-primary); text-decoration: none;">Rohan Mirjankar</a></p>
-    <p style="font-size: 0.85rem; margin-top: 0.5rem;">Made for the cosmos, built for the web.</p>
   </footer>
 
-  <script>
-    // Generate Starfield
-    function generateStarfield() {
-      const starfield = document.getElementById('starfield');
-      const starCount = 100;
+  <!-- ==========================================================================
+       Spotlight Quick Search Modal (Ctrl + K)
+       ========================================================================== -->
+  <div class="search-modal-backdrop" id="spotlight-search-modal" role="dialog" aria-modal="true" aria-label="Spotlight Search">
+    <div class="search-modal-card">
+      <div class="search-modal-input-row">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="spotlight-search-input" class="search-modal-input" placeholder="Type a command or search sections...">
+        <button class="modal-close-btn" id="close-search-modal" aria-label="Close search">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
 
-      for (let i = 0; i < starCount; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.top = Math.random() * 100 + '%';
-        star.style.animationDelay = Math.random() * 3 + 's';
-        starfield.appendChild(star);
-      }
-    }
+      <div class="search-results-list">
+        <div class="search-result-item" data-target="#home">
+          <span><i class="fa-regular fa-window-restore" style="margin-right: 8px;"></i> Virtual Extension Simulator</span>
+          <span class="kbd-shortcut">Demo</span>
+        </div>
+        <div class="search-result-item" data-target="#features">
+          <span><i class="fa-solid fa-cubes" style="margin-right: 8px;"></i> Core Capabilities &amp; Features</span>
+          <span class="kbd-shortcut">Features</span>
+        </div>
+        <div class="search-result-item" data-target="#specs">
+          <span><i class="fa-solid fa-layer-group" style="margin-right: 8px;"></i> Architecture &amp; Code Specs</span>
+          <span class="kbd-shortcut">Specs</span>
+        </div>
+        <div class="search-result-item" data-target="#install">
+          <span><i class="fa-solid fa-rocket" style="margin-right: 8px;"></i> Installation Guide &amp; Quickstart</span>
+          <span class="kbd-shortcut">Install</span>
+        </div>
+        <div class="search-result-item" data-target="#bug">
+          <span><i class="fa-solid fa-bug" style="margin-right: 8px;"></i> Diagnostics &amp; Bug Report</span>
+          <span class="kbd-shortcut">Support</span>
+        </div>
+        <div class="search-result-item" data-target="#community">
+          <span><i class="fa-solid fa-users" style="margin-right: 8px;"></i> Creator &amp; Developer Community</span>
+          <span class="kbd-shortcut">Social</span>
+        </div>
+      </div>
 
-    // Smooth scroll navigation
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', (e) => {
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-      });
-    });
+      <div class="search-modal-footer">
+        <span>Navigate with mouse or keyboard</span>
+        <span>ESC to close</span>
+      </div>
+    </div>
+  </div>
 
-    // Intersection Observer for fade-in animations
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -100px 0px'
-    };
+  <!-- Back to Top Floating Button -->
+  <button class="back-to-top" id="back-to-top-btn" title="Back to top" aria-label="Scroll back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.animationDelay = '0s';
-          observer.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
-
-    document.querySelectorAll('.fade-in-on-scroll').forEach(el => {
-      observer.observe(el);
-    });
-
-    // Update active nav link on scroll
-    window.addEventListener('scroll', () => {
-      const sections = document.querySelectorAll('section');
-      let current = '';
-
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        if (pageYOffset >= sectionTop - 50) {
-          current = section.getAttribute('id');
-        }
-      });
-
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').slice(1) === current) {
-          link.classList.add('active');
-        }
-      });
-    });
-
-    // Bug Report Form Handler
-    document.getElementById('bug-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const title = document.getElementById('bug-title').value;
-      const description = document.getElementById('bug-description').value;
-      const browser = document.getElementById('bug-browser').value;
-
-      // Create GitHub issue URL
-      const body = encodeURIComponent(
-        `## Bug Report\n\n**Title:** ${title}\n\n**Description:**\n${description}\n\n**Browser Info:**\n${browser}`
-      );
-      const issueUrl = `https://github.com/Rohan-Shridhar/Kravoxin/issues/new?title=${encodeURIComponent(title)}&body=${body}`;
-
-      // Open GitHub issues page
-      window.open(issueUrl, '_blank');
-
-      // Reset form
-      e.target.reset();
-      alert('Opening GitHub to create an issue. Thank you for reporting!');
-    });
-
-    // Initialize
-    generateStarfield();
-  </script>
+  <!-- JavaScript -->
+  <script src="script.js"></script>
 </body>
 </html>
