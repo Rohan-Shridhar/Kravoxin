@@ -1,171 +1,64 @@
 /**
- * Kravoxin - Landing Page Interactive Scripts
- * Styled & Inspired by MongoDB (https://www.mongodb.com/)
+ * Kravoxin — Landing Page Interactive Engine
+ * Design Language: UnvibeCode (https://financeflash.github.io/unvibecode/)
+ * Handles:
+ *  1. Live Kravoxin Virtual Extension Simulator & Local Storage Sync
+ *  2. Terminal OS / Browser Installation Command Switcher
+ *  3. Global 1-Click Copy with Clipboard Feedback & Accessibility Announcer
+ *  4. Architecture Demo Modal Dialog (<dialog>)
+ *  5. Browser Marquee Ticker Play/Pause Controller
+ *  6. Client Environment Auto-Detection (Browser, OS, Screen)
+ *  7. GitHub Issue Bug Report Generator
+ *  8. Toast Notification Utility
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  initPencilBanner();
-  initNavigation();
-  initHeroSimulator();
-  initCodeBoxTabs();
-  initTerminalCopy();
+  initVirtualSimulator();
+  initTerminalTabs();
+  initCopyButtons();
+  initArchitectureModal();
+  initTickerControls();
   initEnvironmentDetection();
   initBugReportForm();
-  initSpotlightSearch();
-  initScrollAnimations();
-  initBackToTop();
 });
 
 /* ==========================================================================
-   1. Pencil Announcement Banner Carousel
+   1. Live Kravoxin Virtual Extension Simulator & chrome.storage.local Sync
    ========================================================================== */
-function initPencilBanner() {
-  const items = document.querySelectorAll('.pencil-item');
-  const prevBtn = document.getElementById('pencil-prev');
-  const nextBtn = document.getElementById('pencil-next');
-  if (!items.length) return;
+function initVirtualSimulator() {
+  const listContainer = document.getElementById('sim-list-container');
+  const searchInput = document.getElementById('sim-search-input');
+  const jsonView = document.getElementById('sim-pane-json');
+  const statsLabel = document.getElementById('sim-status-stats');
+  const clearBtn = document.getElementById('sim-clear-btn');
+  const tabPopup = document.getElementById('sim-tab-popup');
+  const tabJson = document.getElementById('sim-tab-json');
+  const panePopup = document.getElementById('sim-pane-popup');
+  const sampleCards = document.querySelectorAll('.sample-repo-card');
 
-  let currentIndex = 0;
-  let bannerInterval;
-
-  function showSlide(index) {
-    items.forEach((item, i) => {
-      item.classList.toggle('active', i === index);
-    });
-    currentIndex = index;
-  }
-
-  function nextSlide() {
-    const next = (currentIndex + 1) % items.length;
-    showSlide(next);
-  }
-
-  function prevSlide() {
-    const prev = (currentIndex - 1 + items.length) % items.length;
-    showSlide(prev);
-  }
-
-  if (nextBtn && prevBtn) {
-    nextBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      nextSlide();
-      resetInterval();
-    });
-
-    prevBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      prevSlide();
-      resetInterval();
-    });
-  }
-
-  function startInterval() {
-    bannerInterval = setInterval(nextSlide, 5500);
-  }
-
-  function resetInterval() {
-    clearInterval(bannerInterval);
-    startInterval();
-  }
-
-  startInterval();
-}
-
-/* ==========================================================================
-   2. Sticky Navigation & Smooth Scroll
-   ========================================================================== */
-function initNavigation() {
-  const nav = document.querySelector('.site-nav');
-  const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
-  const mobileToggle = document.getElementById('mobile-menu-toggle');
-  const mobileDrawer = document.getElementById('mobile-nav-drawer');
-
-  // Sticky nav shadow
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 30) {
-      nav.classList.add('scrolled');
-    } else {
-      nav.classList.remove('scrolled');
-    }
-  });
-
-  // Mobile drawer toggle
-  if (mobileToggle && mobileDrawer) {
-    mobileToggle.addEventListener('click', () => {
-      const isOpen = mobileDrawer.classList.toggle('open');
-      mobileToggle.innerHTML = isOpen 
-        ? '<i class="fa-solid fa-xmark"></i>' 
-        : '<i class="fa-solid fa-bars"></i>';
-    });
-
-    // Close on mobile link click
-    document.querySelectorAll('.mobile-nav-link').forEach(link => {
-      link.addEventListener('click', () => {
-        mobileDrawer.classList.remove('open');
-        mobileToggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
-      });
-    });
-  }
-
-  // Active section indicator on scroll
-  const sections = document.querySelectorAll('section[id], header[id]');
-  window.addEventListener('scroll', () => {
-    let current = '';
-    const scrollPos = window.pageYOffset + 150;
-
-    sections.forEach(section => {
-      const top = section.offsetTop;
-      const height = section.offsetHeight;
-      if (scrollPos >= top && scrollPos < top + height) {
-        current = section.getAttribute('id');
-      }
-    });
-
-    navLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.getAttribute('href') === `#${current}`) {
-        link.classList.add('active');
-      }
-    });
-  });
-}
-
-/* ==========================================================================
-   3. Hero Interactive Kravoxin Extension Simulator & Storage Sync
-   ========================================================================== */
-function initHeroSimulator() {
-  const popupList = document.getElementById('v-popup-list');
-  const jsonViewer = document.getElementById('v-storage-json');
-  const searchInput = document.getElementById('v-search-input');
-  const clearAllBtn = document.getElementById('v-clear-all-btn');
-  const customCopyInput = document.getElementById('custom-copy-input');
-  const customCopyBtn = document.getElementById('custom-copy-btn');
-  const tabBtns = document.querySelectorAll('.demo-tab-btn');
-  const contentPanes = document.querySelectorAll('.demo-content-pane');
-
-  if (!popupList) return;
+  if (!listContainer) return;
 
   // Initial mock history representing actual Kravoxin data
   let historyData = [
     {
       text: 'git clone https://github.com/Rohan-Shridhar/Kravoxin.git',
       favorite: true,
-      timestamp: formatTimestamp(new Date(Date.now() - 1000 * 60 * 5))
+      timestamp: formatTimestamp(new Date(Date.now() - 1000 * 60 * 3))
     },
     {
-      text: 'const client = new MongoClient("mongodb+srv://cluster0.example.net");',
-      favorite: false,
-      timestamp: formatTimestamp(new Date(Date.now() - 1000 * 60 * 18))
-    },
-    {
-      text: 'chrome.storage.local.set({ history: normalizedItems });',
+      text: "chrome.storage.local.get(['history'], (res) => console.log(res));",
       favorite: true,
-      timestamp: formatTimestamp(new Date(Date.now() - 1000 * 60 * 45))
+      timestamp: formatTimestamp(new Date(Date.now() - 1000 * 60 * 14))
     },
     {
-      text: 'npm install --save-dev @types/chrome',
+      text: "curl -H 'Authorization: Bearer sk-live_9428571' https://api.service.com/v1",
       favorite: false,
-      timestamp: formatTimestamp(new Date(Date.now() - 1000 * 60 * 120))
+      timestamp: formatTimestamp(new Date(Date.now() - 1000 * 60 * 42))
+    },
+    {
+      text: "export DATABASE_URL='postgresql://postgres:secret@localhost:5432/kravoxin'",
+      favorite: false,
+      timestamp: formatTimestamp(new Date(Date.now() - 1000 * 60 * 95))
     }
   ];
 
@@ -182,254 +75,331 @@ function initHeroSimulator() {
   }
 
   // Render Virtual Kravoxin Extension Items
-  function renderVirtualPopup(filterText = '') {
-    popupList.innerHTML = '';
-    const filtered = historyData.filter(item => 
-      item.text.toLowerCase().includes(filterText.toLowerCase())
+  function renderList(query = '') {
+    listContainer.innerHTML = '';
+    const q = query.toLowerCase().trim();
+
+    // Sort: favorites first, then newest first
+    const sorted = [...historyData].sort((a, b) => {
+      if (a.favorite && !b.favorite) return -1;
+      if (!a.favorite && b.favorite) return 1;
+      return (b.timestamp || '').localeCompare(a.timestamp || '');
+    });
+
+    const filtered = sorted.filter((item) =>
+      item.text.toLowerCase().includes(q)
     );
 
     if (filtered.length === 0) {
-      popupList.innerHTML = `
-        <div style="text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 13px;">
-          <i class="fa-regular fa-clipboard" style="font-size: 28px; margin-bottom: 8px; opacity: 0.5;"></i>
-          <p>No matching snippets found</p>
+      listContainer.innerHTML = `
+        <div style="text-align: center; padding: 36px 16px; color: var(--muted); font-size: 13px;">
+          <p style="margin: 0 0 6px; font-weight: 700;">No matching clippings found</p>
+          <span style="font-family: var(--mono); font-size: 11px;">Try typing a different keyword or copy a new snippet above.</span>
         </div>
       `;
       updateJsonViewer();
+      updateStats();
       return;
     }
 
-    filtered.forEach((item, idx) => {
+    filtered.forEach((item) => {
       const realIndex = historyData.indexOf(item);
-      const li = document.createElement('div');
-      li.className = `v-history-item ${item.favorite ? 'is-favorite' : ''}`;
-      li.innerHTML = `
-        <div class="v-item-text" title="${escapeHtml(item.text)}">${escapeHtml(item.text)}</div>
-        <div class="v-item-footer">
-          <span class="v-item-time"><i class="fa-regular fa-clock"></i> ${formatDisplayTime(item.timestamp)}</span>
-          <div class="v-item-btn-group">
-            <button class="v-action-btn star-btn ${item.favorite ? 'active' : ''}" title="${item.favorite ? 'Unfavorite' : 'Favorite'}" data-index="${realIndex}">
-              <i class="${item.favorite ? 'fa-solid' : 'fa-regular'} fa-star"></i>
+      const el = document.createElement('div');
+      el.className = `sim-snippet-item ${item.favorite ? 'is-favorite' : ''}`;
+
+      el.innerHTML = `
+        <div class="sim-snippet-text" title="${escapeHtml(item.text)}">${escapeHtml(item.text)}</div>
+        <div class="sim-snippet-meta">
+          <span class="sim-snippet-time">${formatDisplayTime(item.timestamp)}</span>
+          <div class="sim-item-actions">
+            <button type="button" class="sim-action-btn star ${item.favorite ? 'active' : ''}" title="${item.favorite ? 'Unpin favorite' : 'Pin to top'}">
+              ${item.favorite ? '★ Pinned' : '☆ Pin'}
             </button>
-            <button class="v-action-btn copy-btn" title="Copy snippet" data-index="${realIndex}">
-              <i class="fa-regular fa-copy"></i>
-              <span>Copy</span>
+            <button type="button" class="sim-action-btn copy-item-btn" title="Re-copy text to clipboard">
+              Copy
             </button>
-            <button class="v-action-btn delete-btn" title="Delete" data-index="${realIndex}">
-              <i class="fa-regular fa-trash-can"></i>
+            <button type="button" class="sim-action-btn delete-item-btn" title="Delete from local storage">
+              ×
             </button>
           </div>
         </div>
       `;
 
       // Favorite toggle
-      li.querySelector('.star-btn').addEventListener('click', () => {
+      el.querySelector('.star').addEventListener('click', (e) => {
+        e.stopPropagation();
         historyData[realIndex].favorite = !historyData[realIndex].favorite;
-        renderVirtualPopup(searchInput.value);
-        showToast(historyData[realIndex].favorite ? 'Starred item in Kravoxin' : 'Removed from favorites', 'fa-star');
+        renderList(searchInput ? searchInput.value : '');
+        showToast(
+          historyData[realIndex].favorite
+            ? 'Pinned item to top of Kravoxin'
+            : 'Unpinned snippet'
+        );
       });
 
       // Copy Action
-      li.querySelector('.copy-btn').addEventListener('click', async (e) => {
+      el.querySelector('.copy-item-btn').addEventListener('click', async (e) => {
+        e.stopPropagation();
         const btn = e.currentTarget;
+        let ok = false;
         try {
-          await navigator.clipboard.writeText(item.text);
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(item.text);
+            ok = true;
+          } else {
+            ok = fallbackCopy(item.text);
+          }
         } catch (err) {
-          // fallback
+          ok = fallbackCopy(item.text);
         }
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Copied!</span>';
-        btn.style.color = 'var(--brand-forest)';
-        btn.style.borderColor = 'var(--brand-forest)';
-        showToast(`Copied to clipboard: "${item.text.slice(0, 28)}..."`, 'fa-circle-check');
+
+        btn.textContent = ok ? 'Copied!' : 'Copied';
+        btn.style.borderColor = 'var(--emerald)';
+        btn.style.color = 'var(--emerald)';
+        showToast(`Copied snippet to clipboard`);
+
         setTimeout(() => {
-          btn.innerHTML = '<i class="fa-regular fa-copy"></i> <span>Copy</span>';
-          btn.style.color = '';
+          btn.textContent = 'Copy';
           btn.style.borderColor = '';
-        }, 1500);
+          btn.style.color = '';
+        }, 1600);
       });
 
       // Delete Action
-      li.querySelector('.delete-btn').addEventListener('click', () => {
+      el.querySelector('.delete-item-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
         historyData.splice(realIndex, 1);
-        renderVirtualPopup(searchInput.value);
-        showToast('Snippet deleted from local history', 'fa-trash-can');
+        renderList(searchInput ? searchInput.value : '');
+        showToast('Snippet deleted from local store');
       });
 
-      popupList.appendChild(li);
+      listContainer.appendChild(el);
     });
 
     updateJsonViewer();
+    updateStats();
   }
 
-  // Update Live JSON Viewer tab
   function updateJsonViewer() {
-    if (!jsonViewer) return;
-    const jsonString = JSON.stringify({ history: historyData }, null, 2);
-    jsonViewer.innerHTML = syntaxHighlightJson(jsonString);
+    if (!jsonView) return;
+    const jsonStr = JSON.stringify({ history: historyData }, null, 2);
+    jsonView.querySelector('code').textContent = jsonStr;
   }
 
-  function syntaxHighlightJson(json) {
-    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
-      let cls = 'json-number';
-      if (/^"/.test(match)) {
-        if (/:$/.test(match)) {
-          cls = 'json-key';
-        } else {
-          cls = 'json-string';
-        }
-      } else if (/true|false/.test(match)) {
-        cls = 'json-boolean';
-      }
-      return `<span class="${cls}">${match}</span>`;
-    });
+  function updateStats() {
+    if (!statsLabel) return;
+    const favCount = historyData.filter((i) => i.favorite).length;
+    statsLabel.textContent = `Storage: ${historyData.length} items (${favCount} pinned) · 100% Local`;
   }
 
-  // Add new item from sample or custom copy
-  function simulateCapture(text) {
-    if (!text || !text.trim()) return;
-    try {
-      navigator.clipboard.writeText(text);
-    } catch (e) {
-      // browser may block without user gesture
-    }
-    historyData.unshift({
-      text: text.trim(),
-      favorite: false,
-      timestamp: formatTimestamp(new Date())
-    });
-    renderVirtualPopup(searchInput.value);
-    showToast(`Kravoxin captured: "${text.slice(0, 32)}..."`, 'fa-bolt');
-  }
-
-  // Attach sample snippet card click handlers
-  document.querySelectorAll('.sample-snippet-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const snippet = card.getAttribute('data-snippet') || card.querySelector('.snippet-text-content').textContent;
-      simulateCapture(snippet);
-    });
-  });
-
-  // Custom text copy button
-  if (customCopyBtn && customCopyInput) {
-    customCopyBtn.addEventListener('click', () => {
-      if (customCopyInput.value) {
-        simulateCapture(customCopyInput.value);
-        customCopyInput.value = '';
-      }
-    });
-
-    customCopyInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        customCopyBtn.click();
-      }
-    });
-  }
-
-  // Search input handler
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      renderVirtualPopup(e.target.value);
-    });
-  }
-
-  // Clear all non-favorites button
-  if (clearAllBtn) {
-    clearAllBtn.addEventListener('click', () => {
-      const nonFavCount = historyData.filter(i => !i.favorite).length;
-      if (nonFavCount === 0) {
-        showToast('Only favorites remain in history', 'fa-circle-info');
+  // Clean unpinned
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      const removed = historyData.filter((i) => !i.favorite).length;
+      if (removed === 0) {
+        showToast('Only pinned items remain in history');
         return;
       }
-      historyData = historyData.filter(item => item.favorite);
-      renderVirtualPopup(searchInput.value);
-      showToast(`Cleaned ${nonFavCount} non-favorite items`, 'fa-broom');
+      historyData = historyData.filter((i) => i.favorite);
+      renderList(searchInput ? searchInput.value : '');
+      showToast(`Cleaned ${removed} unpinned clippings`);
     });
   }
 
-  // Tab switcher
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetTab = btn.getAttribute('data-tab');
-      tabBtns.forEach(b => b.classList.remove('active'));
-      contentPanes.forEach(p => p.classList.remove('active'));
+  // Filter input
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      renderList(e.target.value);
+    });
+  }
 
-      btn.classList.add('active');
-      const targetPane = document.getElementById(targetTab);
-      if (targetPane) targetPane.classList.add('active');
+  // Tab switching (Popup UI vs Raw JSON)
+  if (tabPopup && tabJson) {
+    tabPopup.addEventListener('click', () => {
+      tabPopup.classList.add('active');
+      tabJson.classList.remove('active');
+      panePopup.style.display = 'block';
+      jsonView.classList.remove('active');
+    });
+
+    tabJson.addEventListener('click', () => {
+      tabJson.classList.add('active');
+      tabPopup.classList.remove('active');
+      panePopup.style.display = 'none';
+      jsonView.classList.add('active');
+      updateJsonViewer();
+    });
+  }
+
+  // Inject sample card snippets on click
+  sampleCards.forEach((card) => {
+    const handleCardClick = async () => {
+      const snippet = card.getAttribute('data-snippet');
+      if (!snippet) return;
+
+      // Copy to real clipboard
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(snippet);
+        } else {
+          fallbackCopy(snippet);
+        }
+      } catch (err) {
+        fallbackCopy(snippet);
+      }
+
+      // Add to virtual storage
+      historyData.unshift({
+        text: snippet,
+        favorite: false,
+        timestamp: formatTimestamp(new Date())
+      });
+
+      // Switch back to popup view if in JSON tab
+      if (tabPopup && !tabPopup.classList.contains('active')) {
+        tabPopup.click();
+      }
+
+      renderList(searchInput ? searchInput.value : '');
+      showToast(`Kravoxin captured: "${snippet.slice(0, 30)}..."`);
+    };
+
+    card.addEventListener('click', handleCardClick);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleCardClick();
+      }
     });
   });
 
   // Initial render
-  renderVirtualPopup();
+  renderList();
 }
 
 /* ==========================================================================
-   4. Code Box Tabs & 1-Click Code Copy
+   2. Terminal OS / Installation Tabs
    ========================================================================== */
-function initCodeBoxTabs() {
-  const tabs = document.querySelectorAll('.code-tab');
-  const panes = document.querySelectorAll('.code-snippet-pane');
-  const copyBtn = document.getElementById('btn-copy-spec-code');
+function initTerminalTabs() {
+  const buttons = document.querySelectorAll('.os-buttons button');
+  const codeEl = document.getElementById('commands');
+  if (!buttons.length || !codeEl) return;
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const targetPaneId = tab.getAttribute('data-pane');
-      tabs.forEach(t => t.classList.remove('active'));
-      panes.forEach(p => p.classList.remove('active'));
+  const commands = {
+    chrome: `# 1. Open Google Chrome or Brave\nchrome://extensions/\n\n# 2. Toggle "Developer mode" in the top-right corner\n# 3. Click "Load unpacked" and select the Kravoxin folder`,
+    edge: `# 1. Open Microsoft Edge\nedge://extensions/\n\n# 2. Toggle "Developer mode" in the left sidebar\n# 3. Click "Load unpacked" and select the Kravoxin folder`,
+    git: `git clone https://github.com/Rohan-Shridhar/Kravoxin.git\ncd Kravoxin\n# Open chrome://extensions and load unpacked folder`
+  };
 
-      tab.classList.add('active');
-      const target = document.getElementById(targetPaneId);
-      if (target) target.classList.add('active');
-    });
-  });
-
-  if (copyBtn) {
-    copyBtn.addEventListener('click', async () => {
-      const activePane = document.querySelector('.code-snippet-pane.active pre code');
-      if (activePane) {
-        try {
-          await navigator.clipboard.writeText(activePane.innerText);
-          copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
-          copyBtn.style.borderColor = 'var(--brand-green)';
-          copyBtn.style.color = 'var(--brand-green)';
-          showToast('Code snippet copied to clipboard', 'fa-check');
-          setTimeout(() => {
-            copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy Code';
-            copyBtn.style.borderColor = '';
-            copyBtn.style.color = '';
-          }, 2000);
-        } catch (err) {
-          showToast('Failed to copy code snippet', 'fa-circle-exclamation');
-        }
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      buttons.forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      const os = btn.dataset.os;
+      if (commands[os]) {
+        codeEl.textContent = commands[os];
       }
     });
+  });
+}
+
+/* ==========================================================================
+   3. Global 1-Click Copy with Feedback & Accessible Announcer
+   ========================================================================== */
+function initCopyButtons() {
+  const copyButtons = document.querySelectorAll('[data-copy]');
+  const copyStatus = document.getElementById('copy-status');
+
+  copyButtons.forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const targetId = btn.dataset.copy;
+      const targetEl = document.getElementById(targetId);
+      if (!targetEl) return;
+
+      const text = targetEl.textContent.trim();
+      const originalLabel = btn.textContent;
+      let ok = false;
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          ok = true;
+        } else {
+          ok = fallbackCopy(text);
+        }
+      } catch (err) {
+        ok = fallbackCopy(text);
+      }
+
+      btn.textContent = ok ? 'Copied' : 'Select & copy';
+      if (copyStatus) {
+        copyStatus.textContent = ok
+          ? 'Text copied to clipboard.'
+          : 'Copy unavailable. Select text manually.';
+      }
+
+      showToast(ok ? 'Copied to clipboard' : 'Select and copy manually');
+
+      setTimeout(() => {
+        btn.textContent = originalLabel;
+      }, 2200);
+    });
+  });
+}
+
+function fallbackCopy(text) {
+  try {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand('copy');
+    area.remove();
+    return ok;
+  } catch (e) {
+    return false;
   }
 }
 
 /* ==========================================================================
-   5. Terminal Command 1-Click Copy
+   4. Architecture Modal Dialog (<dialog>)
    ========================================================================== */
-function initTerminalCopy() {
-  const terminalBtn = document.getElementById('copy-terminal-cmd');
-  if (!terminalBtn) return;
+function initArchitectureModal() {
+  const dialog = document.getElementById('sample-demo-dialog');
+  const watchBtn = document.getElementById('sample-watch');
+  const closeBtn = document.getElementById('sample-demo-close');
 
-  terminalBtn.addEventListener('click', async () => {
-    const cmdText = document.getElementById('terminal-text').innerText.trim();
-    try {
-      await navigator.clipboard.writeText(cmdText);
-      terminalBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
-      terminalBtn.style.backgroundColor = 'var(--brand-green)';
-      terminalBtn.style.color = 'var(--bg-dark)';
-      showToast('Cloning command copied to clipboard!', 'fa-terminal');
-      setTimeout(() => {
-        terminalBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
-        terminalBtn.style.backgroundColor = '';
-        terminalBtn.style.color = '';
-      }, 2000);
-    } catch (err) {
-      showToast('Could not copy command', 'fa-circle-exclamation');
+  if (!dialog || !watchBtn || !closeBtn) return;
+
+  watchBtn.addEventListener('click', () => {
+    dialog.showModal();
+  });
+
+  closeBtn.addEventListener('click', () => {
+    dialog.close();
+  });
+
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) {
+      dialog.close();
     }
+  });
+}
+
+/* ==========================================================================
+   5. Browser Marquee Ticker Controller
+   ========================================================================== */
+function initTickerControls() {
+  const root = document.getElementById('uvc-logo-preview');
+  const toggleBtn = document.getElementById('ticker-toggle-btn');
+  if (!root || !toggleBtn) return;
+
+  toggleBtn.addEventListener('click', () => {
+    const isPaused = root.classList.toggle('paused');
+    toggleBtn.textContent = isPaused ? 'Play' : 'Pause';
+    toggleBtn.setAttribute('aria-pressed', String(isPaused));
   });
 }
 
@@ -437,17 +407,15 @@ function initTerminalCopy() {
    6. Client Environment Auto-Detection
    ========================================================================== */
 function initEnvironmentDetection() {
-  const browserEl = document.getElementById('detected-browser');
-  const osEl = document.getElementById('detected-os');
-  const resolutionEl = document.getElementById('detected-resolution');
-  const formBrowserInput = document.getElementById('bug-browser-field');
+  const envField = document.getElementById('bug-env-field');
+  if (!envField) return;
 
-  let browser = 'Chrome (Chromium)';
+  let browser = 'Chromium';
   const ua = navigator.userAgent;
 
   if (ua.includes('Edg/')) {
     browser = 'Microsoft Edge';
-  } else if (ua.includes('Brave')) {
+  } else if (ua.includes('Brave') || (navigator.brave && typeof navigator.brave.isBrave === 'function')) {
     browser = 'Brave Browser';
   } else if (ua.includes('OPR/') || ua.includes('Opera')) {
     browser = 'Opera';
@@ -458,23 +426,20 @@ function initEnvironmentDetection() {
   }
 
   let os = 'Windows';
-  if (navigator.userAgent.includes('Macintosh') || navigator.userAgent.includes('Mac OS')) {
+  if (ua.includes('Macintosh') || ua.includes('Mac OS')) {
     os = 'macOS';
-  } else if (navigator.userAgent.includes('Linux')) {
+  } else if (ua.includes('Linux')) {
     os = 'Linux';
+  } else if (ua.includes('CrOS')) {
+    os = 'ChromeOS';
   }
 
   const res = `${window.screen.width} × ${window.screen.height}`;
-  const envString = `${browser} on ${os} (${res})`;
-
-  if (browserEl) browserEl.textContent = browser;
-  if (osEl) osEl.textContent = os;
-  if (resolutionEl) resolutionEl.textContent = res;
-  if (formBrowserInput) formBrowserInput.value = envString;
+  envField.value = `${browser} on ${os} (${res}) | Kravoxin v1.4.0 (Manifest V3)`;
 }
 
 /* ==========================================================================
-   7. Bug Report Form Submission to GitHub Issues
+   7. GitHub Issue Bug Report Generator
    ========================================================================== */
 function initBugReportForm() {
   const form = document.getElementById('bug-report-form');
@@ -483,157 +448,43 @@ function initBugReportForm() {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const title = document.getElementById('bug-title-input').value.trim();
-    const category = document.getElementById('bug-category-select').value;
-    const description = document.getElementById('bug-desc-input').value.trim();
-    const browserInfo = document.getElementById('bug-browser-field').value;
+    const titleInput = document.getElementById('bug-title-input');
+    const categorySelect = document.getElementById('bug-category-select');
+    const descInput = document.getElementById('bug-desc-input');
+    const envField = document.getElementById('bug-env-field');
+
+    const title = titleInput ? titleInput.value.trim() : 'Bug report';
+    const category = categorySelect ? categorySelect.value : 'Bug';
+    const desc = descInput ? descInput.value.trim() : '';
+    const env = envField ? envField.value : '';
 
     const issueTitle = `[${category}] ${title}`;
-    const issueBody = `## Bug Report\n\n` +
-      `### Summary\n${description}\n\n` +
-      `### Category\n${category}\n\n` +
-      `### Environment Information\n- **Browser / OS:** ${browserInfo}\n- **Extension Version:** Kravoxin v1.4.0\n\n` +
-      `### Steps to Reproduce\n1. Copy text on webpage\n2. Open Kravoxin popup\n3. Observe behavior\n\n` +
-      `*Submitted via Kravoxin Landing Page*`;
+    const issueBody = `## Summary
+${desc}
+
+### Environment Details
+- **Environment:** ${env}
+- **Extension:** Kravoxin v1.4.0 (Manifest V3)
+- **Local Storage:** chrome.storage.local
+
+### Steps to Reproduce
+1. Copy text on webpage
+2. Open Kravoxin popup
+3. Observe behavior
+
+*Submitted via Kravoxin Landing Page Generator*`;
 
     const githubUrl = `https://github.com/Rohan-Shridhar/Kravoxin/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
 
-    window.open(githubUrl, '_blank');
-    form.reset();
-    initEnvironmentDetection();
-    showToast('GitHub issue generator launched!', 'fa-github');
+    window.open(githubUrl, '_blank', 'noopener,noreferrer');
+    showToast('GitHub issue template opened in new tab');
   });
 }
 
 /* ==========================================================================
-   8. Spotlight Quick Search Modal (Cmd+K / Ctrl+K)
+   8. Toast Notification Utility
    ========================================================================== */
-function initSpotlightSearch() {
-  const backdrop = document.getElementById('spotlight-search-modal');
-  const triggerBtns = document.querySelectorAll('.open-search-modal');
-  const closeBtn = document.getElementById('close-search-modal');
-  const searchInput = document.getElementById('spotlight-search-input');
-  const resultItems = document.querySelectorAll('.search-result-item');
-
-  if (!backdrop) return;
-
-  function openModal() {
-    backdrop.classList.add('open');
-    setTimeout(() => {
-      if (searchInput) {
-        searchInput.focus();
-        searchInput.value = '';
-        filterResults('');
-      }
-    }, 50);
-  }
-
-  function closeModal() {
-    backdrop.classList.remove('open');
-  }
-
-  triggerBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      openModal();
-    });
-  });
-
-  if (closeBtn) {
-    closeBtn.addEventListener('click', closeModal);
-  }
-
-  backdrop.addEventListener('click', (e) => {
-    if (e.target === backdrop) closeModal();
-  });
-
-  // Keyboard shortcut Ctrl+K or Cmd+K
-  window.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-      e.preventDefault();
-      if (backdrop.classList.contains('open')) {
-        closeModal();
-      } else {
-        openModal();
-      }
-    } else if (e.key === 'Escape' && backdrop.classList.contains('open')) {
-      closeModal();
-    }
-  });
-
-  function filterResults(query) {
-    const q = query.toLowerCase().trim();
-    resultItems.forEach(item => {
-      const text = item.textContent.toLowerCase();
-      item.style.display = text.includes(q) ? 'flex' : 'none';
-    });
-  }
-
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      filterResults(e.target.value);
-    });
-  }
-
-  resultItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const targetId = item.getAttribute('data-target');
-      closeModal();
-      if (targetId) {
-        const el = document.querySelector(targetId);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
-    });
-  });
-}
-
-/* ==========================================================================
-   9. Scroll Reveal Animations
-   ========================================================================== */
-function initScrollAnimations() {
-  const revealElements = document.querySelectorAll('.reveal-on-scroll');
-
-  const observer = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('revealed');
-        obs.unobserve(entry.target);
-      }
-    });
-  }, {
-    threshold: 0.12,
-    rootMargin: '0px 0px -40px 0px'
-  });
-
-  revealElements.forEach(el => observer.observe(el));
-}
-
-/* ==========================================================================
-   10. Back to Top Button
-   ========================================================================== */
-function initBackToTop() {
-  const btn = document.getElementById('back-to-top-btn');
-  if (!btn) return;
-
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 400) {
-      btn.classList.add('visible');
-    } else {
-      btn.classList.remove('visible');
-    }
-  });
-
-  btn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-}
-
-/* ==========================================================================
-   Toast Notification Utility
-   ========================================================================== */
-function showToast(message, iconClass = 'fa-check') {
+function showToast(message) {
   let container = document.getElementById('toast-container');
   if (!container) {
     container = document.createElement('div');
@@ -644,10 +495,7 @@ function showToast(message, iconClass = 'fa-check') {
 
   const toast = document.createElement('div');
   toast.className = 'toast';
-  toast.innerHTML = `
-    <i class="fa-solid ${iconClass} toast-icon"></i>
-    <span>${escapeHtml(message)}</span>
-  `;
+  toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
 
   container.appendChild(toast);
 
@@ -657,8 +505,8 @@ function showToast(message, iconClass = 'fa-check') {
       if (toast.parentNode) {
         toast.parentNode.removeChild(toast);
       }
-    }, 300);
-  }, 3200);
+    }, 250);
+  }, 2600);
 }
 
 function escapeHtml(str) {

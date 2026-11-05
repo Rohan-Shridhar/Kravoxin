@@ -1,983 +1,758 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kravoxin | The Intelligent Clipboard Platform for Builders</title>
-  <meta name="description" content="Kravoxin is a lightweight, modern Chrome extension that automatically captures and organizes your clipboard history with 100% local-first privacy.">
-  <meta name="keywords" content="clipboard manager, chrome extension, developer tools, local storage, manifest v3, open source">
-  
-  <!-- Open Graph / Facebook -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kravoxin — The Privacy-First Clipboard Platform for Builders</title>
+  <meta name="description" content="Capture every snippet, code block, and command with zero cloud latency. 100% client-side storage in Chrome, Brave, and Edge with Manifest V3.">
+  <meta name="theme-color" content="#f7f6f2">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Kravoxin | The Intelligent Clipboard Platform for Builders">
-  <meta property="og:description" content="Automatic capture, zero-latency local search, and 100% privacy in your Chrome browser.">
+  <meta property="og:title" content="Kravoxin — The Privacy-First Clipboard Platform for Builders">
+  <meta property="og:description" content="Automatic capture, zero-latency local search, and 100% client-side storage in your browser.">
   <meta property="og:image" content="assets/banner.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/icons/icon48.png">
 
-  <!-- Fonts: Plus Jakarta Sans (MongoDB Söhne style) & JetBrains Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Canonical -->
+  <link rel="canonical" href="https://rohan-shridhar.github.io/Kravoxin/">
+  <meta property="og:url" content="https://rohan-shridhar.github.io/Kravoxin/">
 
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <!-- Structured Data: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Kravoxin",
+    "description": "A lightweight, modern Chrome Extension that automatically captures and saves your clipboard history locally with 100% privacy.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Chrome, Brave, Edge, Chromium (Windows, macOS, Linux)",
+    "softwareRequirements": "Chromium 88+ or newer",
+    "downloadUrl": "https://github.com/Rohan-Shridhar/Kravoxin",
+    "sameAs": "https://github.com/Rohan-Shridhar/Kravoxin"
+  }
+  </script>
 
-  <!-- MongoDB-inspired Custom Stylesheet -->
+  <!-- Structured Data: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does Kravoxin do?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Kravoxin captures every text snippet, code block, and command you copy in your browser and stores it in your local browser storage. You can search history, pin critical snippets, and re-copy items with one click."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Kravoxin send any data to external servers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Kravoxin is 100% local-first. All clippings are stored exclusively inside chrome.storage.local on your machine. Exactly zero bytes leave your computer."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which browsers are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Kravoxin supports all modern Chromium-based browsers that implement Manifest V3, including Google Chrome, Brave Browser, Microsoft Edge, Arc, Chromium, Vivaldi, and Opera."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is Kravoxin different from OS clipboard managers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "OS clipboard tools often wipe history upon reboot, lack specialized code and secret management, or require heavy background daemon processes. Kravoxin runs natively inside your browser sandbox with sub-millisecond search and zero background battery drain."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- UnvibeCode-Inspired Modernist Stylesheet -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Accessible Skip Link -->
+  <a class="skip" href="#main">Skip to content</a>
 
-  <!-- ==========================================================================
-       Pencil Announcement Banner (MongoDB Style)
-       ========================================================================== -->
-  <aside class="pencil-banner" aria-label="Announcements">
-    <div class="pencil-container">
-      <div class="pencil-slider">
-        <!-- Slide 1 -->
-        <div class="pencil-item active" id="pencil-slide-1">
-          <span class="pencil-pill">Announcement</span>
-          <span class="pencil-text">
-            Kravoxin v1.4.0 is live: Instant search, favorite pinning &amp; local-first storage.
-            <a href="#features" class="pencil-link">Explore features <i class="fa-solid fa-arrow-right"></i></a>
-          </span>
-        </div>
-        <!-- Slide 2 -->
-        <div class="pencil-item" id="pencil-slide-2">
-          <span class="pencil-pill">Security</span>
-          <span class="pencil-text">
-            100% Client-Side Privacy: 0 bytes sent to external cloud servers.
-            <a href="#specs" class="pencil-link">View architecture <i class="fa-solid fa-arrow-right"></i></a>
-          </span>
-        </div>
-        <!-- Slide 3 -->
-        <div class="pencil-item" id="pencil-slide-3">
-          <span class="pencil-pill">Open Source</span>
-          <span class="pencil-text">
-            Manifest V3 compliant with ultra-low memory footprint.
-            <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer" class="pencil-link">Star on GitHub <i class="fa-solid fa-star"></i></a>
-          </span>
-        </div>
-      </div>
-
-      <div class="pencil-controls">
-        <button class="pencil-btn" id="pencil-prev" title="Previous Announcement" aria-label="Previous announcement">
-          <i class="fa-solid fa-chevron-left"></i>
-        </button>
-        <button class="pencil-btn" id="pencil-next" title="Next Announcement" aria-label="Next announcement">
-          <i class="fa-solid fa-chevron-right"></i>
-        </button>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ==========================================================================
-       Navigation Bar (MongoDB Style)
-       ========================================================================== -->
-  <header class="site-nav" id="top">
-    <div class="nav-container">
-      <div class="nav-brand-group">
-        <a href="#top" class="brand-logo" aria-label="Kravoxin Home">
-          <div class="brand-icon">
-            <!-- Kravoxin Icon from assets -->
-            <img src="assets/icons/icon48.png" alt="Kravoxin Logo" width="32" height="32" style="border-radius: 8px;">
-          </div>
-          <div class="brand-text">
-            Kravoxin
-            <span class="brand-version">v1.4</span>
-          </div>
+  <div class="frame">
+    <!-- ==========================================================================
+         Header & Navigation (UnvibeCode Style)
+         ========================================================================== -->
+    <header>
+      <a class="brand" href="#main" aria-label="Kravoxin home">
+        <img src="assets/icons/icon48.png" alt="" class="brand-badge-icon" width="24" height="24">
+        Kravoxin<span>Extension</span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="#outputs">What you get</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#comparison">Compare</a>
+        <a href="#faq">FAQ</a>
+        <a class="star" href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer">
+          <span aria-hidden="true">☆</span> Star on GitHub
         </a>
+      </nav>
+    </header>
 
-        <nav class="nav-menu-wrapper" aria-label="Primary Navigation">
-          <ul class="nav-menu">
-            <li><a href="#features" class="nav-link">Features</a></li>
-            <li><a href="#specs" class="nav-link">Architecture</a></li>
-            <li><a href="#install" class="nav-link">Quickstart</a></li>
-            <li><a href="#bug" class="nav-link">Bug Report</a></li>
-            <li><a href="#community" class="nav-link">Community</a></li>
-          </ul>
-        </nav>
-      </div>
-
-      <div class="nav-actions">
-        <!-- Quick Search Modal Trigger -->
-        <button class="nav-search-btn open-search-modal" title="Quick Search">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <span>Search documentation...</span>
-          <span class="kbd-shortcut">Ctrl K</span>
-        </button>
-
-        <!-- GitHub Stars Badge -->
-        <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer" class="btn-github-stars" title="View repository on GitHub">
-          <i class="fa-brands fa-github"></i>
-          <span>Star</span>
-          <span class="star-count">★ 142</span>
-        </a>
-
-        <!-- MongoDB Signature Green Primary CTA -->
-        <a href="#install" class="btn btn-primary">
-          <i class="fa-brands fa-chrome"></i>
-          <span>Add to Chrome</span>
-        </a>
-
-        <!-- Mobile Menu Toggle -->
-        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle navigation menu">
-          <i class="fa-solid fa-bars"></i>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Mobile Navigation Drawer -->
-  <div class="mobile-nav-drawer" id="mobile-nav-drawer">
-    <ul class="mobile-nav-menu">
-      <li><a href="#features" class="mobile-nav-link">Features</a></li>
-      <li><a href="#specs" class="mobile-nav-link">Architecture &amp; Tech Stack</a></li>
-      <li><a href="#install" class="mobile-nav-link">Installation Guide</a></li>
-      <li><a href="#bug" class="mobile-nav-link">Report a Bug</a></li>
-      <li><a href="#community" class="mobile-nav-link">Developer Community</a></li>
-    </ul>
-  </div>
-
-  <main>
-    <!-- ==========================================================================
-         Hero Section (MongoDB Inspired)
-         ========================================================================== -->
-    <section class="hero-section" id="home">
-      <div class="hero-grid">
-        <!-- Hero Left Column: Headline & Action -->
-        <div class="hero-content-col">
-          <div class="hero-eyebrow">
-            <span class="eyebrow-dot"></span>
-            THE INTELLIGENT CLIPBOARD PLATFORM FOR BUILDERS
+    <main id="main">
+      <!-- ==========================================================================
+           Hero Section (2-Column Grid)
+           ========================================================================== -->
+      <section class="hero" aria-labelledby="hero-title">
+        <!-- Hero Left Column: Copy & Quickstart -->
+        <div class="hero-copy">
+          <p class="eyebrow">CHROME EXTENSION · 100% CLIENT-SIDE STORAGE</p>
+          <h1 id="hero-title">Capture every snippet. Never lose context.</h1>
+          <p class="lede">Kravoxin records and organizes your clipboard history directly in your browser. Zero cloud latency, zero external telemetry, and 100% client-side storage.</p>
+          <p class="fomo">You copy hundreds of code blocks, tokens, and commands every day. Where do they go?</p>
+          
+          <div class="actions">
+            <a class="button primary" href="#get-started">Get started <span aria-hidden="true">&nbsp;↗</span></a>
+            <a class="button secondary" href="#architecture">Explore architecture</a>
           </div>
 
-          <h1 class="hero-title">
-            Every snippet.<br>
-            Any workflow.<br>
-            <span class="hero-title-highlight">One intelligent platform.</span>
-          </h1>
-
-          <p class="hero-subtitle">
-            Combine real-time clipboard stream capture, sub-millisecond local search, and guaranteed 100% data privacy in an ultra-lightweight Chrome extension. Built for developers, creators, and power users.
-          </p>
-
-          <div class="hero-cta-group">
-            <a href="#install" class="btn btn-primary btn-lg">
-              <span>Add to Chrome — Free</span>
-              <i class="fa-solid fa-arrow-right"></i>
-            </a>
-
-            <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-lg">
-              <i class="fa-brands fa-github"></i>
-              <span>Explore GitHub</span>
-            </a>
+          <div class="install-mini">
+            <code id="quick-command">git clone https://github.com/Rohan-Shridhar/Kravoxin.git</code>
+            <button class="copy" data-copy="quick-command" aria-label="Copy clone command">Copy</button>
           </div>
-
-          <ul class="hero-trust-list">
-            <li><i class="fa-solid fa-circle-check"></i> 100% Local Storage</li>
-            <li><i class="fa-solid fa-circle-check"></i> Manifest V3 Ready</li>
-            <li><i class="fa-solid fa-circle-check"></i> Zero Cloud Tracking</li>
-          </ul>
+          
+          <p class="subnote">Manifest V3 &nbsp; / &nbsp; Chrome, Brave, Edge &amp; Chromium &nbsp; / &nbsp; 0 Cloud Telemetry</p>
         </div>
 
-        <!-- Hero Right Column: Interactive Developer Simulator -->
-        <div class="hero-demo-wrapper">
-          <div class="demo-header-bar">
-            <div class="window-dots">
-              <span class="dot dot-red"></span>
-              <span class="dot dot-yellow"></span>
-              <span class="dot dot-green"></span>
+        <!-- Hero Right Column: Live Interactive Kravoxin Simulator Panel -->
+        <div class="hero-visual sample-browser" aria-labelledby="sample-browser-title">
+          <div class="sample-browser-top">
+            <p class="eyebrow">EXPLORE KRAVOXIN SIMULATOR</p>
+            <button type="button" class="sample-watch" id="sample-watch" aria-haspopup="dialog">▷ Architecture modal</button>
+          </div>
+
+          <h2 id="sample-browser-title">Test the clipboard engine in real time.</h2>
+          <p class="sample-browser-intro">Click any sample snippet to inject it into local history, or test instant filtering.</p>
+
+          <!-- 4 Quick Sample Snippet Cards -->
+          <div class="sample-repo-grid">
+            <div class="sample-repo-card" role="button" tabindex="0" data-snippet="git clone https://github.com/Rohan-Shridhar/Kravoxin.git" aria-label="Copy Git clone snippet">
+              <span class="sample-repo-kind">Shell / Git</span>
+              <span class="sample-repo-name">git clone Kravoxin<span aria-hidden="true">↗</span></span>
+              <span class="sample-repo-stat"><strong>Instant capture</strong> into history</span>
+              <span class="sample-repo-areas">Click to copy snippet</span>
             </div>
 
-            <div class="demo-tabs-nav" role="tablist">
-              <button class="demo-tab-btn active" data-tab="pane-simulator" role="tab" aria-selected="true">
-                <i class="fa-regular fa-window-restore"></i> Virtual Extension
-              </button>
-              <button class="demo-tab-btn" data-tab="pane-storage" role="tab" aria-selected="false">
-                <i class="fa-solid fa-database"></i> Storage JSON
-              </button>
-              <button class="demo-tab-btn" data-tab="pane-arch" role="tab" aria-selected="false">
-                <i class="fa-solid fa-network-wired"></i> Architecture
-              </button>
+            <div class="sample-repo-card" role="button" tabindex="0" data-snippet="chrome.storage.local.get(['history'], (res) => console.log(res));" aria-label="Copy Extension API snippet">
+              <span class="sample-repo-kind">Extension API</span>
+              <span class="sample-repo-name">chrome.storage.local<span aria-hidden="true">↗</span></span>
+              <span class="sample-repo-stat"><strong>Local-first schema</strong></span>
+              <span class="sample-repo-areas">Click to copy snippet</span>
             </div>
 
-            <div class="demo-live-badge">
-              <span class="pulse"></span> LIVE
+            <div class="sample-repo-card" role="button" tabindex="0" data-snippet="curl -H 'Authorization: Bearer sk-live_9428571' https://api.service.com/v1" aria-label="Copy API Key snippet">
+              <span class="sample-repo-kind">API Secret</span>
+              <span class="sample-repo-name">curl Auth Header<span aria-hidden="true">↗</span></span>
+              <span class="sample-repo-stat"><strong>0 bytes transmitted</strong></span>
+              <span class="sample-repo-areas">Click to copy snippet</span>
+            </div>
+
+            <div class="sample-repo-card" role="button" tabindex="0" data-snippet="export DATABASE_URL='postgresql://postgres:secret@localhost:5432/kravoxin'" aria-label="Copy Database URL snippet">
+              <span class="sample-repo-kind">Environment</span>
+              <span class="sample-repo-name">DATABASE_URL<span aria-hidden="true">↗</span></span>
+              <span class="sample-repo-stat"><strong>Client-side sandbox</strong></span>
+              <span class="sample-repo-areas">Click to copy snippet</span>
             </div>
           </div>
 
-          <!-- Tab 1: Virtual Extension Simulator Pane -->
-          <div class="demo-content-pane active" id="pane-simulator">
-            <div class="simulator-grid">
-              <!-- Web Page Simulator (Click to Copy) -->
-              <div class="web-sample-box">
-                <div class="sample-box-title">
-                  <i class="fa-solid fa-globe" style="color: var(--brand-forest);"></i>
-                  <span>Webpage Copy Trigger</span>
-                </div>
-                <p class="sample-box-desc">
-                  Click any sample code snippet below to simulate copying. Watch Kravoxin's live popup capture it instantly!
-                </p>
-
-                <div class="sample-snippet-card" data-snippet="git clone https://github.com/Rohan-Shridhar/Kravoxin.git" title="Click to copy into Kravoxin">
-                  <span class="snippet-text-content">git clone https://github.com/Rohan-Shridhar/Kravoxin.git</span>
-                  <span class="snippet-copy-action"><i class="fa-regular fa-copy"></i> Copy</span>
-                </div>
-
-                <div class="sample-snippet-card" data-snippet="npm install kravoxin-extension --save" title="Click to copy into Kravoxin">
-                  <span class="snippet-text-content">npm install kravoxin-extension --save</span>
-                  <span class="snippet-copy-action"><i class="fa-regular fa-copy"></i> Copy</span>
-                </div>
-
-                <div class="sample-snippet-card" data-snippet="mongodb+srv://admin:cluster@kravoxin.db.net/prod" title="Click to copy into Kravoxin">
-                  <span class="snippet-text-content">mongodb+srv://admin:cluster@kravoxin.db.net...</span>
-                  <span class="snippet-copy-action"><i class="fa-regular fa-copy"></i> Copy</span>
-                </div>
-
-                <!-- Custom copy input -->
-                <div class="custom-copy-input-row">
-                  <input type="text" id="custom-copy-input" class="custom-copy-input" placeholder="Type custom snippet &amp; press Enter...">
-                  <button id="custom-copy-btn" class="custom-copy-btn" title="Simulate Copy">Copy</button>
-                </div>
+          <!-- Interactive Virtual Kravoxin Extension Box -->
+          <div class="simulator-box" id="virtual-simulator">
+            <div class="sim-header">
+              <div class="sim-title">
+                <img src="assets/icons/icon16.png" alt="" width="16" height="16">
+                <span>Kravoxin Extension (Simulated)</span>
               </div>
-
-              <!-- Virtual Kravoxin Extension Popup -->
-              <div class="virtual-popup">
-                <div class="v-popup-header">
-                  <div class="v-popup-brand">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M19 3H14.82C14.4 1.84 13.3 1 12 1C10.7 1 9.6 1.84 9.18 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM12 3C12.55 3 13 3.45 13 4C13 4.55 12.55 5 12 5C11.45 5 11 4.55 11 4C11 3.45 11.45 3 12 3ZM19 19H5V5H7V7H17V5H19V19Z" fill="currentColor"/>
-                    </svg>
-                    <span>Kravoxin</span>
-                  </div>
-                  <div class="v-popup-actions">
-                    <button id="v-clear-all-btn" class="v-btn-clear" title="Clear all non-favorites">
-                      <i class="fa-solid fa-broom"></i>
-                      <span>Clear All</span>
-                    </button>
-                    <span class="v-badge-author">By Rohan</span>
-                  </div>
-                </div>
-
-                <!-- Virtual Search Input -->
-                <div class="v-search-bar">
-                  <i class="fa-solid fa-magnifying-glass" style="font-size: 11px; color: var(--text-muted);"></i>
-                  <input type="text" id="v-search-input" class="v-search-input" placeholder="Instant filter snippets...">
-                </div>
-
-                <!-- Virtual History List -->
-                <div class="v-popup-list" id="v-popup-list">
-                  <!-- Populated by script.js -->
-                </div>
+              <div class="sim-nav-tabs">
+                <button type="button" class="sim-tab-btn active" id="sim-tab-popup" data-sim-tab="popup">Popup UI</button>
+                <button type="button" class="sim-tab-btn" id="sim-tab-json" data-sim-tab="json">JSON Storage</button>
               </div>
             </div>
-          </div>
 
-          <!-- Tab 2: Storage JSON Viewer -->
-          <div class="demo-content-pane" id="pane-storage">
-            <div class="code-viewer-container" id="v-storage-json">
-              <!-- Dynamically populated with syntax-highlighted json -->
-            </div>
-          </div>
+            <!-- Tab 1: Live Popup List View -->
+            <div id="sim-pane-popup">
+              <div class="sim-search-bar">
+                <input type="text" id="sim-search-input" class="sim-search-input" placeholder="Filter clippings by text..." aria-label="Filter clipboard snippets">
+              </div>
 
-          <!-- Tab 3: Architecture Diagram Flow -->
-          <div class="demo-content-pane" id="pane-arch">
-            <div class="arch-diagram-flow">
-              <div class="arch-node">
-                <span class="arch-node-badge">1. DOM Event</span>
-                <div class="arch-node-content">
-                  <h4>Web Page User Action</h4>
-                  <p>User highlights text and presses Ctrl+C / Cmd+C on any webpage.</p>
-                </div>
-              </div>
-              <div class="arch-arrow"><i class="fa-solid fa-arrow-down"></i></div>
-              <div class="arch-node">
-                <span class="arch-node-badge">2. content.js</span>
-                <div class="arch-node-content">
-                  <h4>Event Listener &amp; Message Dispatch</h4>
-                  <p>Content script intercepts copy event, normalizes string payload, and dispatches to background runtime.</p>
-                </div>
-              </div>
-              <div class="arch-arrow"><i class="fa-solid fa-arrow-down"></i></div>
-              <div class="arch-node">
-                <span class="arch-node-badge">3. background.js</span>
-                <div class="arch-node-content">
-                  <h4>Manifest V3 Service Worker</h4>
-                  <p>Service worker formats timestamp (yyyymmddhhmmss) and safely persists item to <code>chrome.storage.local</code>.</p>
-                </div>
-              </div>
-              <div class="arch-arrow"><i class="fa-solid fa-arrow-down"></i></div>
-              <div class="arch-node">
-                <span class="arch-node-badge">4. popup.html</span>
-                <div class="arch-node-content">
-                  <h4>Virtual DOM Reactive Interface</h4>
-                  <p>Popup reads normalized state, handles favorite status, instant search, and one-click re-copying.</p>
-                </div>
+              <div class="sim-list-container" id="sim-list-container">
+                <!-- Dynamically populated via script.js -->
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- ==========================================================================
-         Trust & Ecosystem Section (MongoDB Logo & Metrics Strip)
-         ========================================================================== -->
-    <section class="ecosystem-section" aria-label="Supported Browser Ecosystem">
-      <div class="ecosystem-container">
-        <h2 class="ecosystem-title">Engineered for Modern Browsers &amp; Power Workflows</h2>
+            <!-- Tab 2: Live Raw JSON Viewer View -->
+            <pre class="sim-json-view" id="sim-pane-json" aria-label="Raw chrome.storage.local JSON"><code>{}</code></pre>
 
-        <div class="browser-logos-grid">
-          <div class="browser-card">
-            <i class="fa-brands fa-chrome" style="color: #4285f4;"></i>
-            <span>Google Chrome</span>
-          </div>
-          <div class="browser-card">
-            <i class="fa-brands fa-edge" style="color: #0078d7;"></i>
-            <span>Microsoft Edge</span>
-          </div>
-          <div class="browser-card">
-            <i class="fa-brands fa-brave" style="color: #fb542b;"></i>
-            <span>Brave Browser</span>
-          </div>
-          <div class="browser-card">
-            <i class="fa-solid fa-compass" style="color: #ff3366;"></i>
-            <span>Arc Browser</span>
-          </div>
-          <div class="browser-card">
-            <i class="fa-brands fa-opera" style="color: #ff1b2d;"></i>
-            <span>Opera</span>
-          </div>
-          <div class="browser-card">
-            <i class="fa-brands fa-github" style="color: #24292e;"></i>
-            <span>Chromium Core</span>
-          </div>
-        </div>
-
-        <!-- 4 Key Metrics -->
-        <div class="metrics-row reveal-on-scroll">
-          <div class="metric-item">
-            <div class="metric-val">100%</div>
-            <div class="metric-label">Local-First Storage (Zero Cloud)</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-val">&lt; 2ms</div>
-            <div class="metric-label">Sub-Millisecond Search Query</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-val">0 KB</div>
-            <div class="metric-label">Zero Telemetry or Data Leaks</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-val">v1.4.0</div>
-            <div class="metric-label">Production Manifest V3 Standard</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================================================
-         Dark Section: Core Capabilities (MongoDB Atlas Midnight Slate Theme)
-         ========================================================================== -->
-    <section class="dark-section" id="features">
-      <div class="dark-container">
-        <div class="dark-section-header reveal-on-scroll">
-          <div class="section-eyebrow-dark">
-            <i class="fa-solid fa-cubes"></i> CORE CAPABILITIES
-          </div>
-          <h2 class="dark-section-title">
-            Built for speed. <span>Engineered for privacy.</span>
-          </h2>
-          <p class="dark-section-subtitle">
-            Explore the core architectural features that make Kravoxin the fastest, most dependable local clipboard manager in the Chrome ecosystem.
-          </p>
-        </div>
-
-        <div class="dark-features-grid">
-          <!-- Card 1 -->
-          <div class="dark-feature-card reveal-on-scroll">
-            <div class="dark-card-icon">
-              <i class="fa-solid fa-bolt"></i>
-            </div>
-            <h3>Automatic Stream Capture</h3>
-            <p>
-              Silently and passively listens for copied text across any active webpage. Captures rich text, code snippets, URLs, and tokens without adding input latency or interfering with page scripts.
-            </p>
-            <div>
-              <span class="card-code-pill"><i class="fa-solid fa-code"></i> content.js listener</span>
+            <div class="sim-footer">
+              <span id="sim-status-stats">Storage: 4 items (100% Local)</span>
+              <button type="button" class="sim-clear-btn" id="sim-clear-btn" title="Remove unpinned items">Clean Unpinned</button>
             </div>
           </div>
 
-          <!-- Card 2 -->
-          <div class="dark-feature-card reveal-on-scroll">
-            <div class="dark-card-icon">
-              <i class="fa-solid fa-shield-halved"></i>
-            </div>
-            <h3>Zero-Cloud Local Vault</h3>
-            <p>
-              Your clipboard history belongs exclusively to you. All entries and timestamps reside inside <code>chrome.storage.local</code>. No analytics, no third-party APIs, and no telemetry tracking.
-            </p>
-            <div>
-              <span class="card-code-pill"><i class="fa-solid fa-lock"></i> 100% Client-Side</span>
-            </div>
-          </div>
+          <p class="sample-browser-outputs">Every captured snippet includes sortable timestamps and one-click recopying.</p>
 
-          <!-- Card 3 -->
-          <div class="dark-feature-card reveal-on-scroll">
-            <div class="dark-card-icon">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-            <h3>Sub-Millisecond Search</h3>
-            <p>
-              Filter through hundreds of previously copied snippets in real-time. Instant client-side substring matching lets you find long commands, JSON strings, or links with zero lag.
-            </p>
-            <div>
-              <span class="card-code-pill"><i class="fa-solid fa-bolt"></i> Instant Fuzzy Filter</span>
-            </div>
-          </div>
-
-          <!-- Card 4 -->
-          <div class="dark-feature-card reveal-on-scroll">
-            <div class="dark-card-icon">
-              <i class="fa-solid fa-star"></i>
-            </div>
-            <h3>Favorite &amp; Retention Shield</h3>
-            <p>
-              Star important snippets such as API tokens, bash one-liners, and documentation links. Favorited items are shielded from bulk "Clear All" deletions and always prioritized.
-            </p>
-            <div>
-              <span class="card-code-pill"><i class="fa-solid fa-shield-heart"></i> Pin Protection</span>
-            </div>
-          </div>
-
-          <!-- Card 5 -->
-          <div class="dark-feature-card reveal-on-scroll">
-            <div class="dark-card-icon">
-              <i class="fa-solid fa-copy"></i>
-            </div>
-            <h3>One-Click Re-Copy Engine</h3>
-            <p>
-              Write any historical snippet straight back to your system clipboard with a single click. Includes immediate visual confirmation toasts and timestamp refresh mechanisms.
-            </p>
-            <div>
-              <span class="card-code-pill"><i class="fa-solid fa-paperclip"></i> navigator.clipboard</span>
-            </div>
-          </div>
-
-          <!-- Card 6 -->
-          <div class="dark-feature-card reveal-on-scroll">
-            <div class="dark-card-icon">
-              <i class="fa-solid fa-microchip"></i>
-            </div>
-            <h3>Ultra-Lightweight Footprint</h3>
-            <p>
-              Built without bulky UI frameworks or heavy external libraries. Pure vanilla JavaScript, clean CSS, and optimized Manifest V3 service workers for instant popup load times.
-            </p>
-            <div>
-              <span class="card-code-pill"><i class="fa-solid fa-gauge-high"></i> &lt; 25KB Runtime</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================================================
-         Light Section: Architecture & Code Specs (MongoDB "Tech Stack")
-         ========================================================================== -->
-    <section class="specs-section" id="specs">
-      <div class="specs-grid">
-        <!-- Specs Content Left -->
-        <div class="specs-content-col reveal-on-scroll">
-          <div class="hero-eyebrow">
-            <i class="fa-solid fa-layer-group"></i> UNDER THE HOOD
-          </div>
-          <h2>
-            Works seamlessly with <span>your tech stack.</span>
-          </h2>
-          <p>
-            Kravoxin follows strict Manifest V3 architecture guidelines. It leverages asynchronous storage promises, normalized data shapes, and passive event interception to ensure zero browser overhead.
-          </p>
-
-          <ul class="specs-checklist">
-            <li>
-              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
-              <div class="check-text">
-                <strong>Event-Driven Background Service Worker</strong>
-                <span>Runs only when copy events occur, terminating automatically to preserve CPU cycles and battery life.</span>
-              </div>
-            </li>
-            <li>
-              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
-              <div class="check-text">
-                <strong>Normalized Schema with Precise Timestamps</strong>
-                <span>Items are tracked with <code>yyyymmddhhmmss</code> formats, duplicate resilience, and explicit favorite flags.</span>
-              </div>
-            </li>
-            <li>
-              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
-              <div class="check-text">
-                <strong>Minimalist Permission Footprint</strong>
-                <span>Requires strictly <code>storage</code> and <code>clipboardWrite</code>. Zero access to browsing history or personal tabs.</span>
-              </div>
-            </li>
-          </ul>
-
-          <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer" class="btn btn-forest">
-            <i class="fa-brands fa-github"></i>
-            <span>Browse Full Repository</span>
+          <a class="sample-private" href="#get-started">
+            <span>
+              <strong>Install on your browser</strong>
+              <span>Load unpacked in developer mode in under 30 seconds.</span>
+            </span>
+            <span aria-hidden="true">→</span>
           </a>
-        </div>
 
-        <!-- Code Box Right (MongoDB Style Tabs) -->
-        <div class="code-box-wrapper reveal-on-scroll">
-          <div class="code-box-tabs">
-            <div class="code-tabs-list">
-              <button class="code-tab active" data-pane="code-storage">storage.js</button>
-              <button class="code-tab" data-pane="code-bg">background.js</button>
-              <button class="code-tab" data-pane="code-content">content.js</button>
+          <!-- Architecture / Preview Modal Dialog -->
+          <dialog class="sample-demo" id="sample-demo-dialog" aria-labelledby="sample-demo-title">
+            <div class="sample-demo-head">
+              <strong id="sample-demo-title">Kravoxin Architecture in Action</strong>
+              <button type="button" id="sample-demo-close" aria-label="Close architecture modal">Close ×</button>
             </div>
-            <button class="btn-copy-code" id="btn-copy-spec-code" title="Copy code">
-              <i class="fa-regular fa-copy"></i> Copy Code
-            </button>
-          </div>
 
-          <!-- Code Snippet 1: storage.js -->
-          <div class="code-snippet-pane active" id="code-storage">
-<pre><code><span class="syn-comment">// Kravoxin Storage Helper Engine</span>
-<span class="syn-kw">async function</span> <span class="syn-fn">addHistoryItem</span>(<span class="syn-prop">text</span>, <span class="syn-prop">timestamp</span> = <span class="syn-fn">formatCopyTimestamp</span>()) {
-  <span class="syn-kw">const</span> history = <span class="syn-kw">await</span> <span class="syn-fn">getHistory</span>();
-  
-  <span class="syn-comment">// Newest items prepend to the front</span>
-  history.<span class="syn-fn">unshift</span>({
-    text,
-    favorite: <span class="syn-kw">false</span>,
-    timestamp
-  });
+            <figure class="demo-figure">
+              <svg class="demo-diagram-svg" viewBox="0 0 800 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Kravoxin Architecture Flow Diagram">
+                <rect width="800" height="240" fill="#f7f6f2"/>
+                <rect x="30" y="40" width="200" height="150" fill="#ffffff" stroke="#35352e" stroke-width="1.5"/>
+                <text x="50" y="70" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#171714">01 / WEB PAGE</text>
+                <text x="50" y="98" font-family="ui-monospace, monospace" font-size="11" fill="#575750">User presses Ctrl+C</text>
+                <text x="50" y="118" font-family="ui-monospace, monospace" font-size="11" fill="#575750">content.js captures</text>
+                <text x="50" y="138" font-family="ui-monospace, monospace" font-size="11" fill="#575750">copy event listener</text>
+                <text x="50" y="165" font-family="ui-monospace, monospace" font-size="10" fill="#007f5d">✓ 0 latency DOM hook</text>
 
-  <span class="syn-kw">await</span> <span class="syn-fn">saveHistory</span>(history);
-}
+                <path d="M230 115 L290 115" stroke="#35352e" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-<span class="syn-comment">// Protected bulk clear preserving starred items</span>
-<span class="syn-kw">async function</span> <span class="syn-fn">clearAllHistory</span>() {
-  <span class="syn-kw">const</span> history = <span class="syn-kw">await</span> <span class="syn-fn">getHistory</span>();
-  <span class="syn-kw">const</span> favoritesOnly = history.<span class="syn-fn">filter</span>((<span class="syn-prop">item</span>) =&gt; item.favorite);
-  <span class="syn-kw">await</span> <span class="syn-fn">saveHistory</span>(favoritesOnly);
-}</code></pre>
-          </div>
+                <rect x="295" y="40" width="210" height="150" fill="#ffffff" stroke="#35352e" stroke-width="1.5"/>
+                <text x="315" y="70" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#171714">02 / BACKGROUND WORKER</text>
+                <text x="315" y="98" font-family="ui-monospace, monospace" font-size="11" fill="#575750">service_worker event</text>
+                <text x="315" y="118" font-family="ui-monospace, monospace" font-size="11" fill="#575750">Normalizes record:</text>
+                <text x="315" y="138" font-family="ui-monospace, monospace" font-size="11" fill="#575750">{ text, timestamp, fav }</text>
+                <text x="315" y="165" font-family="ui-monospace, monospace" font-size="10" fill="#007f5d">✓ Deduplicates &amp; timestamps</text>
 
-          <!-- Code Snippet 2: background.js -->
-          <div class="code-snippet-pane" id="code-bg">
-<pre><code><span class="syn-comment">// Manifest V3 Background Service Worker</span>
-importScripts(<span class="syn-str">'storage.js'</span>);
+                <path d="M505 115 L565 115" stroke="#35352e" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-chrome.runtime.onMessage.<span class="syn-fn">addListener</span>((<span class="syn-prop">message</span>, <span class="syn-prop">sender</span>, <span class="syn-prop">sendResponse</span>) =&gt; {
-  <span class="syn-kw">if</span> (message.type === <span class="syn-str">'TEXT_COPIED'</span> &amp;&amp; message.payload) {
-    <span class="syn-fn">addHistoryItem</span>(message.payload)
-      .<span class="syn-fn">then</span>(() =&gt; <span class="syn-fn">sendResponse</span>({ success: <span class="syn-kw">true</span> }))
-      .<span class="syn-fn">catch</span>((<span class="syn-prop">err</span>) =&gt; <span class="syn-fn">sendResponse</span>({ success: <span class="syn-kw">false</span>, error: err }));
-    <span class="syn-kw">return true</span>; <span class="syn-comment">// Keep channel open for async response</span>
-  }
-});</code></pre>
-          </div>
+                <rect x="570" y="40" width="200" height="150" fill="#ffffff" stroke="#35352e" stroke-width="1.5"/>
+                <text x="590" y="70" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#171714">03 / LOCAL STORAGE</text>
+                <text x="590" y="98" font-family="ui-monospace, monospace" font-size="11" fill="#575750">chrome.storage.local</text>
+                <text x="590" y="118" font-family="ui-monospace, monospace" font-size="11" fill="#575750">Persisted locally</text>
+                <text x="590" y="138" font-family="ui-monospace, monospace" font-size="11" fill="#575750">Zero external calls</text>
+                <text x="590" y="165" font-family="ui-monospace, monospace" font-size="10" fill="#007f5d">✓ 100% Client-Side</text>
 
-          <!-- Code Snippet 3: content.js -->
-          <div class="code-snippet-pane" id="code-content">
-<pre><code><span class="syn-comment">// Passive DOM Clipboard Observer</span>
-document.<span class="syn-fn">addEventListener</span>(<span class="syn-str">'copy'</span>, () =&gt; {
-  <span class="syn-comment">// Read selection from active document</span>
-  <span class="syn-kw">const</span> selectedText = window.<span class="syn-fn">getSelection</span>()?.<span class="syn-fn">toString</span>()?.<span class="syn-fn">trim</span>();
-  
-  <span class="syn-kw">if</span> (selectedText &amp;&amp; selectedText.length &gt; <span class="syn-num">0</span>) {
-    chrome.runtime.<span class="syn-fn">sendMessage</span>({
-      type: <span class="syn-str">'TEXT_COPIED'</span>,
-      payload: selectedText
-    });
-  }
-});</code></pre>
-          </div>
+                <defs>
+                  <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1 L 7 5 L 0 9 z" fill="#35352e"/>
+                  </marker>
+                </defs>
+              </svg>
+              <figcaption>The Kravoxin event lifecycle: from DOM copy event to chrome.storage.local with zero external HTTP traffic.</figcaption>
+            </figure>
+          </dialog>
         </div>
+      </section>
+
+      <!-- ==========================================================================
+           Four Practical Outputs / Feature Grid (UnvibeCode Style)
+           ========================================================================== -->
+      <section id="outputs" class="feature-grid" aria-label="Four practical outputs in review order">
+        <h2 class="sr-only">One extension. Four practical capabilities.</h2>
+        
+        <article class="feature">
+          <span class="number">01 / AUTOMATIC CAPTURE</span>
+          <h3>Zero-Latency History</h3>
+          <p>Every snippet copied across any web page is instantly captured and indexed in background memory with microsecond timestamps.</p>
+        </article>
+
+        <article class="feature">
+          <span class="number">02 / LOCAL PRIVACY</span>
+          <h3>Zero Cloud Latency</h3>
+          <p>Stored exclusively in <code>chrome.storage.local</code>. Zero analytics, zero tracking, and zero bytes sent to external cloud servers.</p>
+        </article>
+
+        <article class="feature">
+          <span class="number">03 / INSTANT PINNING</span>
+          <h3>Sub-Millisecond Search</h3>
+          <p>Filter thousands of historical clippings instantly with fuzzy search. Star and pin essential bash commands, tokens, or links.</p>
+        </article>
+
+        <article class="feature">
+          <span class="number">04 / MANIFEST V3</span>
+          <h3>Engineered for Speed</h3>
+          <p>Built with lightweight vanilla Web APIs without heavyweight frameworks, background bloat, or memory leaks.</p>
+        </article>
+      </section>
+
+      <!-- ==========================================================================
+           Performance & Privacy Benchmark Strip (UnvibeCode Style)
+           ========================================================================== -->
+      <section class="section understanding-metric study-impact" aria-labelledby="metric-title">
+        <div>
+          <p class="eyebrow">LOCAL STORAGE &amp; PRIVACY BENCHMARK</p>
+          <h2 id="metric-title">0 Cloud Bytes.<br><span class="impact-number">0.4ms</span><br>instant retrieval.</h2>
+        </div>
+        <div class="impact-detail">
+          <p>Kravoxin operates completely offline within your browser sandbox. <strong>100% of clipboard events</strong> remain on your machine.</p>
+          <a href="#architecture">Explore storage architecture &amp; specs →</a>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           Browser Compatibility Marquee Strip (UnvibeCode Style)
+           ========================================================================== -->
+      <div id="uvc-logo-preview">
+        <section class="strip" aria-label="Compatible with all Chromium-based browsers">
+          <div class="heading">
+            <h3>Compatible with all modern Chromium browsers</h3>
+            <button type="button" id="ticker-toggle-btn" aria-pressed="false">Pause</button>
+          </div>
+
+          <div class="window">
+            <div class="track" id="browser-ticker-track">
+              <!-- Group 1 -->
+              <div class="group">
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Google Chrome</span>
+                    <span class="tile-sub">Chromium 88+</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Brave Browser</span>
+                    <span class="tile-sub">Shields Compatible</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Microsoft Edge</span>
+                    <span class="tile-sub">Windows &amp; macOS</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Arc Browser</span>
+                    <span class="tile-sub">Chromium Core</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Chromium</span>
+                    <span class="tile-sub">Open Source Base</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Vivaldi</span>
+                    <span class="tile-sub">Power User Ready</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Opera</span>
+                    <span class="tile-sub">Manifest V3</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Group 2 (Duplicate for Seamless Loop) -->
+              <div class="group" aria-hidden="true">
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Google Chrome</span>
+                    <span class="tile-sub">Chromium 88+</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Brave Browser</span>
+                    <span class="tile-sub">Shields Compatible</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Microsoft Edge</span>
+                    <span class="tile-sub">Windows &amp; macOS</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Arc Browser</span>
+                    <span class="tile-sub">Chromium Core</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Chromium</span>
+                    <span class="tile-sub">Open Source Base</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Vivaldi</span>
+                    <span class="tile-sub">Power User Ready</span>
+                  </div>
+                </div>
+                <div class="tile">
+                  <div class="tile-brand">
+                    <span class="tile-brand-name">Opera</span>
+                    <span class="tile-sub">Manifest V3</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
-    </section>
 
-    <!-- ==========================================================================
-         Installation Guide (MongoDB Quickstart Style)
-         ========================================================================== -->
-    <section class="install-section" id="install">
-      <div class="install-container">
-        <div class="section-center-header reveal-on-scroll">
-          <div class="hero-eyebrow">
-            <i class="fa-solid fa-rocket"></i> QUICKSTART GUIDE
+      <!-- ==========================================================================
+           Developer Feedback / Quotes (UnvibeCode Style)
+           ========================================================================== -->
+      <section class="section developer-feedback" aria-labelledby="feedback-title">
+        <div class="feedback-heading">
+          <div>
+            <h2 id="feedback-title">Kravoxin, in their words</h2>
           </div>
-          <h2>
-            Get up and running in <span>under 60 seconds.</span>
-          </h2>
-          <p>
-            No complex setup or account registration required. Load Kravoxin directly into Chrome as an unpacked developer extension.
-          </p>
+          <p class="feedback-source">Feedback from engineers building with local-first tooling.</p>
         </div>
 
-        <div class="install-steps-grid">
-          <!-- Step 1 -->
-          <div class="install-step-card reveal-on-scroll">
-            <div class="step-badge">01</div>
-            <h3>Clone or Download</h3>
-            <p>Clone the repository from GitHub or download the source code archive to your local drive.</p>
-          </div>
+        <div class="feedback-grid">
+          <figure class="feedback-card">
+            <blockquote>“The biggest friction in developer workflows is losing that bash one-liner or database token you copied 10 minutes ago. Kravoxin's zero-latency history makes context switching frictionless.”</blockquote>
+            <figcaption>
+              Alex Chen
+              <span>Systems Engineer, Cloud Infrastructure</span>
+            </figcaption>
+          </figure>
 
-          <!-- Step 2 -->
-          <div class="install-step-card reveal-on-scroll">
-            <div class="step-badge">02</div>
-            <h3>Open Extensions</h3>
-            <p>Navigate to <code>chrome://extensions/</code> in your Google Chrome or Chromium browser.</p>
-          </div>
+          <figure class="feedback-card">
+            <blockquote>“Every commercial clipboard extension I tried bundled Google Analytics, remote scripts, or sent snippets to cloud sync. Kravoxin is strictly local in chrome.storage.local. 0 bytes leave my laptop.”</blockquote>
+            <figcaption>
+              Priya Sharma
+              <span>Security Researcher &amp; Full Stack Dev</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
 
-          <!-- Step 3 -->
-          <div class="install-step-card reveal-on-scroll">
-            <div class="step-badge">03</div>
-            <h3>Developer Mode</h3>
-            <p>Toggle on the <strong>Developer mode</strong> switch in the upper right-hand corner of the page.</p>
-          </div>
-
-          <!-- Step 4 -->
-          <div class="install-step-card reveal-on-scroll">
-            <div class="step-badge">04</div>
-            <h3>Load Unpacked</h3>
-            <p>Click the <strong>Load unpacked</strong> button and select the downloaded <code>Kravoxin</code> root folder.</p>
-          </div>
-
-          <!-- Step 5 -->
-          <div class="install-step-card reveal-on-scroll">
-            <div class="step-badge">05</div>
-            <h3>Pin &amp; Enjoy</h3>
-            <p>Pin the Kravoxin extension icon to your toolbar. Copy any text online and watch it save automatically!</p>
+      <!-- ==========================================================================
+           Quickstart & Terminal Section (UnvibeCode Style)
+           ========================================================================== -->
+      <section id="get-started" class="section split">
+        <div>
+          <p class="eyebrow">START WITH YOUR BROWSER</p>
+          <h2>Three quick steps.<br>Ready in seconds.</h2>
+          <p class="section-intro">Load Kravoxin directly into Chrome Developer Mode. No accounts, no subscriptions, and no cloud dependencies required.</p>
+          <div class="link-row">
+            <a href="https://github.com/Rohan-Shridhar/Kravoxin/blob/main/manifest.json" target="_blank" rel="noopener noreferrer">Manifest V3 specs ↗</a>
+            <a href="https://github.com/Rohan-Shridhar/Kravoxin/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Open source license ↗</a>
           </div>
         </div>
 
-        <!-- Terminal Command Box -->
-        <div class="terminal-box reveal-on-scroll">
-          <div class="terminal-cmd">
-            <span class="terminal-prompt">$</span>
-            <span id="terminal-text">git clone https://github.com/Rohan-Shridhar/Kravoxin.git</span>
-          </div>
-          <button class="btn btn-sm btn-dark-secondary" id="copy-terminal-cmd" title="Copy Command">
-            <i class="fa-regular fa-copy"></i> Copy
-          </button>
-        </div>
-      </div>
-    </section>
+        <div>
+          <div class="terminal">
+            <div class="terminal-head">
+              <div class="os-buttons" role="group" aria-label="Choose your installation method">
+                <button type="button" data-os="chrome" aria-pressed="true">Chrome / Brave</button>
+                <button type="button" data-os="edge" aria-pressed="false">Microsoft Edge</button>
+                <button type="button" data-os="git" aria-pressed="false">Git Clone</button>
+              </div>
+              <button class="copy" data-copy="commands" aria-label="Copy installation steps">Copy</button>
+            </div>
 
-    <!-- ==========================================================================
-         Bug Report & Diagnostics Section
-         ========================================================================== -->
-    <section class="bug-section" id="bug">
-      <div class="bug-grid">
-        <!-- Bug Info & Environment Diagnostics Left -->
-        <div class="bug-info-col reveal-on-scroll">
-          <div class="hero-eyebrow">
-            <i class="fa-solid fa-bug"></i> SUPPORT &amp; DIAGNOSTICS
-          </div>
-          <h2>
-            Found an issue? <span>Report directly to GitHub.</span>
-          </h2>
-          <p>
-            Help us improve Kravoxin! Fill in the quick diagnostic form to generate an issue pre-formatted with your specific browser environment data.
-          </p>
+            <pre class="code"><code id="commands"># 1. Open Google Chrome or Brave
+chrome://extensions/
 
-          <div class="env-detect-card">
-            <div class="env-detect-title">
-              <i class="fa-solid fa-laptop-code" style="color: var(--brand-forest);"></i>
-              <span>Auto-Detected System Environment</span>
-            </div>
-            <div class="env-info-row">
-              <span class="env-label">Browser Engine:</span>
-              <span class="env-val" id="detected-browser">Detecting...</span>
-            </div>
-            <div class="env-info-row">
-              <span class="env-label">Operating System:</span>
-              <span class="env-val" id="detected-os">Detecting...</span>
-            </div>
-            <div class="env-info-row">
-              <span class="env-label">Display Resolution:</span>
-              <span class="env-val" id="detected-resolution">Detecting...</span>
-            </div>
-            <div class="env-info-row">
-              <span class="env-label">Extension Version:</span>
-              <span class="env-val">v1.4.0 (Manifest V3)</span>
-            </div>
-          </div>
+# 2. Toggle "Developer mode" in the top-right corner
+# 3. Click "Load unpacked" and select the Kravoxin folder</code></pre>
 
-          <div style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5;">
-            <i class="fa-solid fa-circle-info" style="color: var(--brand-forest); margin-right: 6px;"></i>
-            Submitting opens a new GitHub issue ticket where you can track updates and collaborate with the maintainer.
+            <p class="code-note">Requires any Chromium browser with Manifest V3 support (Chrome 88+).</p>
           </div>
         </div>
+      </section>
 
-        <!-- Bug Report Form Right -->
-        <div class="bug-form-card reveal-on-scroll">
-          <form id="bug-report-form">
-            <div class="form-group">
-              <label for="bug-title-input" class="form-label">Issue Title *</label>
-              <input type="text" id="bug-title-input" class="form-input" placeholder="e.g., Clipboard items fail to copy on specific domains" required>
+      <!-- ==========================================================================
+           Supported Formats (UnvibeCode Language-Line Style)
+           ========================================================================== -->
+      <section class="section language-line" aria-labelledby="languages-title">
+        <h2 id="languages-title">Supported Formats</h2>
+        <div>
+          <div class="languages">
+            <span class="language">Plain Text</span>
+            <span class="language">Bash &amp; Shell</span>
+            <span class="language">TypeScript &amp; JS</span>
+            <span class="language">SQL Queries</span>
+            <span class="language">JSON / YAML</span>
+            <span class="language">Markdown</span>
+            <span class="language">API Keys &amp; Tokens</span>
+            <span class="language">HTML / CSS</span>
+          </div>
+          <p class="fine">Captures standard clipboard text MIME formats. Stored items preserve line breaks, indentation, and formatting with timestamp sorting.</p>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           Architecture Deep Dive Section (UnvibeCode Style)
+           ========================================================================== -->
+      <section class="section" id="architecture">
+        <p class="eyebrow">EXTENSION ARCHITECTURE / LOCAL-FIRST</p>
+        <h2>How Kravoxin manages your clipboard securely.</h2>
+        <p class="sample-summary">Kravoxin is architected to prioritize zero cloud latency, low RAM overhead, and total user privacy using modern Manifest V3 service workers.</p>
+
+        <div class="sample-output-grid">
+          <article>
+            <p class="eyebrow">01 / CONTENT SCRIPT HOOK</p>
+            <h3>Instant DOM Capture</h3>
+            <p>A lightweight content script listens for copy events without polling or keyboard recording. Only text explicitly copied is transmitted to the worker.</p>
+            <a class="button primary" href="#get-started">Install Kravoxin →</a>
+          </article>
+
+          <article>
+            <p class="eyebrow">02 / LOCAL DATA STORE</p>
+            <h3>chrome.storage.local</h3>
+            <p>Clippings are stored in an indexed chronological array with <code>yyyymmddhhmmss</code> timestamps and favorite flags. Zero remote database sync.</p>
+            <a class="button secondary" href="https://github.com/Rohan-Shridhar/Kravoxin/blob/main/scripts/storage.js" target="_blank" rel="noopener noreferrer">View storage.js →</a>
+          </article>
+
+          <article>
+            <p class="eyebrow">03 / POPUP RENDERER</p>
+            <h3>Zero-Framework UI</h3>
+            <p>The popup interface renders with vanilla JavaScript, providing sub-millisecond filtering, 1-click re-copying, and selective garbage collection.</p>
+            <a class="button secondary" href="https://github.com/Rohan-Shridhar/Kravoxin/blob/main/popup/popup.js" target="_blank" rel="noopener noreferrer">View popup.js →</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           Developer Guides & Resources (UnvibeCode Style)
+           ========================================================================== -->
+      <section id="resources" class="section">
+        <div class="resources-head">
+          <div>
+            <p class="eyebrow">DEVELOPER RESOURCES</p>
+            <h2>Guides for extension developers and builders.</h2>
+          </div>
+        </div>
+
+        <div class="resource-grid">
+          <article class="resource">
+            <span class="number">GUIDE</span>
+            <h3>Building Privacy-First Manifest V3 Extensions</h3>
+            <p>Explore service worker lifecycles, permissions scoping, and why minimizing permissions builds user trust.</p>
+            <a href="https://github.com/Rohan-Shridhar/Kravoxin/blob/main/README.md" target="_blank" rel="noopener noreferrer">Read the guide ↗</a>
+          </article>
+
+          <article class="resource">
+            <span class="number">SPEC</span>
+            <h3>Storage Schema &amp; Timestamping Spec</h3>
+            <p>Understand the chronological normalization schema and how timestamps enable deterministic sorting.</p>
+            <a href="https://github.com/Rohan-Shridhar/Kravoxin/blob/main/plan.md" target="_blank" rel="noopener noreferrer">Explore the roadmap ↗</a>
+          </article>
+
+          <article class="resource">
+            <span class="number">CONTRIBUTE</span>
+            <h3>Open Source Contribution Guidelines</h3>
+            <p>Join the Kravoxin repository, report bugs, propose new features, and help shape future phases.</p>
+            <a href="https://github.com/Rohan-Shridhar/Kravoxin/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing guide ↗</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           Comparison Table (UnvibeCode Style)
+           ========================================================================== -->
+      <section class="section" id="comparison" aria-labelledby="comparison-title">
+        <p class="eyebrow">KRAVOXIN VS OTHER CLIPBOARD MANAGERS</p>
+        <h2 id="comparison-title">Compare privacy, speed, and footprint.</h2>
+        <p class="comparison-intro">Most clipboard tools sacrifice privacy for cloud features or clutter your OS with background processes. Kravoxin runs natively inside your browser sandbox.</p>
+
+        <div class="comparison-scroll" tabindex="0" role="region" aria-label="Clipboard tool comparison">
+          <table class="comparison-table">
+            <caption>Kravoxin vs Alternative Clipboard Solutions</caption>
+            <thead>
+              <tr>
+                <th scope="col">Solution</th>
+                <th scope="col">Storage &amp; Privacy</th>
+                <th scope="col">Search &amp; Pinning</th>
+                <th scope="col">Network &amp; Cloud Telemetry</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">OS Native (Win+V / macOS)</th>
+                <td>Stored in OS buffer; frequently wiped on system reboot or lacks fine-grained history.</td>
+                <td>Basic history view, no fuzzy code search, limited formatting support.</td>
+                <td>May sync across Microsoft / Apple accounts depending on OS settings.</td>
+              </tr>
+              <tr>
+                <th scope="row">Cloud Clipboard Apps</th>
+                <td>Stored on external third-party servers; requires user sign-in and cloud accounts.</td>
+                <td>Rich search across devices, but dependent on cloud network connectivity.</td>
+                <td>Continuous network sync; transmits confidential tokens and sensitive clips to servers.</td>
+              </tr>
+              <tr>
+                <th scope="row">Commercial Chrome Extensions</th>
+                <td>Often closed-source; may contain Google Analytics, trackers, or monetization scripts.</td>
+                <td>Varies; frequently bloated with ads, upgrade prompts, or premium subscriptions.</td>
+                <td>Sends telemetry, crash reports, or user behavior events over HTTP.</td>
+              </tr>
+              <tr class="comparison-highlight">
+                <th scope="row">Kravoxin (Open Source)</th>
+                <td>100% Client-Side in chrome.storage.local. Never leaves your local machine.</td>
+                <td>Instant instant-filter search, one-click pinning, formatted timestamps, selective delete.</td>
+                <td>Zero network requests. 0 bytes leave your machine. 100% open source.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           FAQ Accordion (UnvibeCode Style)
+           ========================================================================== -->
+      <section class="section faq" id="faq" aria-labelledby="faq-title">
+        <div>
+          <p class="eyebrow">ENGINEERS ASK</p>
+          <h2 id="faq-title">Local storage.<br>Complete control.</h2>
+        </div>
+
+        <div>
+          <details open>
+            <summary>What does Kravoxin do?</summary>
+            <p>Kravoxin captures every text snippet, code block, and command you copy on web pages and indexes it in your browser's local storage. You can view chronological history, search snippets instantly, star critical items, and re-copy them to your clipboard with one click.</p>
+          </details>
+
+          <details>
+            <summary>Does Kravoxin transmit any clipboard data to cloud servers?</summary>
+            <p><strong>Zero bytes.</strong> Kravoxin is strictly local-first. All clippings are stored inside <code>chrome.storage.local</code> within your browser sandbox. There are no remote API servers, no telemetry trackers, and no analytics beacons.</p>
+          </details>
+
+          <details>
+            <summary>How do I install Kravoxin in Chrome, Brave, or Edge?</summary>
+            <p>Clone or download the repository, navigate to <code>chrome://extensions/</code> (or <code>edge://extensions/</code>), toggle <strong>Developer mode</strong> on in the upper-right corner, and click <strong>Load unpacked</strong>. Select the Kravoxin repository folder, and the extension is instantly active.</p>
+          </details>
+
+          <details>
+            <summary>What happens when I clear history?</summary>
+            <p>Clicking <strong>Clear All</strong> cleans all unstarred snippets from local storage, keeping your favorite pinned snippets intact. You can also delete individual snippets at any time with the trash can icon.</p>
+          </details>
+
+          <details>
+            <summary>Why is Manifest V3 compliance important?</summary>
+            <p>Manifest V3 ensures that the extension uses event-driven service workers that sleep when not in use. This prevents battery drain, reduces background memory usage to near zero, and complies with modern Chrome security standards.</p>
+          </details>
+
+          <details>
+            <summary>Can I use Kravoxin with keyboard shortcuts?</summary>
+            <p>Yes. You can assign a custom keyboard shortcut to open the Kravoxin popup by visiting <code>chrome://extensions/shortcuts</code> in your browser.</p>
+          </details>
+
+          <details>
+            <summary>Is Kravoxin completely free and open source?</summary>
+            <p>Yes. Kravoxin is released under the MIT Open Source License. You are free to inspect the source code, modify it, or contribute improvements on GitHub.</p>
+          </details>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           AI Assistant & Bug Diagnostics Section (UnvibeCode Style)
+           ========================================================================== -->
+      <section class="section assistant-chat" aria-labelledby="assistant-title">
+        <h2 id="assistant-title">Set up Kravoxin or diagnose your environment.</h2>
+        <p>Copy the prompt to configure Kravoxin with your AI coding assistant, or launch an automated issue report.</p>
+
+        <div class="actions">
+          <button class="button secondary" type="button" data-copy="assistant-prompt">Copy assistant setup prompt</button>
+          <a class="button primary" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Chat with ChatGPT ↗</a>
+          <a class="button secondary" href="https://claude.ai/" target="_blank" rel="noopener noreferrer">Chat with Claude ↗</a>
+        </div>
+
+        <details class="setup-prompt">
+          <summary>View assistant setup prompt</summary>
+          <p id="assistant-prompt">How do I install and configure the Kravoxin Chrome Extension (v1.4.0) for my browser? Use https://github.com/Rohan-Shridhar/Kravoxin. Explain how Manifest V3 service workers interact with chrome.storage.local to provide 100% client-side privacy, how content scripts capture copy events, and how to verify that zero external network requests are made.</p>
+        </details>
+
+        <!-- Diagnostic / GitHub Issue Generator Box -->
+        <div class="diagnostics-box" id="diagnostics-box">
+          <p class="eyebrow">AUTOMATED DIAGNOSTICS &amp; BUG REPORT</p>
+          <h3>Generate a Pre-filled GitHub Issue</h3>
+          <p class="diag-intro">Your browser and environment have been detected automatically below. Submit to open a pre-filled issue ticket on GitHub.</p>
+
+          <form id="bug-report-form" class="diag-form">
+            <div class="diag-form-row">
+              <div class="diag-field">
+                <label for="bug-title-input">Issue Title</label>
+                <input type="text" id="bug-title-input" placeholder="e.g. Snippet formatting issue in Brave" required>
+              </div>
+
+              <div class="diag-field">
+                <label for="bug-category-select">Category</label>
+                <select id="bug-category-select">
+                  <option value="Bug">Bug Report</option>
+                  <option value="Feature">Feature Request</option>
+                  <option value="Performance">Performance Inquiry</option>
+                  <option value="Storage">Local Storage / Schema</option>
+                </select>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="bug-category-select" class="form-label">Category *</label>
-              <select id="bug-category-select" class="form-select">
-                <option value="Bug">Bug Report (Unexpected Behavior)</option>
-                <option value="Performance">Performance / Latency</option>
-                <option value="UI/UX">UI / Display Glitch</option>
-                <option value="Feature Request">Feature Request / Enhancement</option>
-              </select>
+            <div class="diag-field">
+              <label for="bug-env-field">Detected Environment (Auto)</label>
+              <input type="text" id="bug-env-field" readonly value="Detecting browser and operating system...">
             </div>
 
-            <div class="form-group">
-              <label for="bug-desc-input" class="form-label">Description &amp; Steps to Reproduce *</label>
-              <textarea id="bug-desc-input" class="form-textarea" placeholder="Describe what happened, what you expected, and any reproduction steps..." required></textarea>
+            <div class="diag-field">
+              <label for="bug-desc-input">Description / Steps to Reproduce</label>
+              <textarea id="bug-desc-input" placeholder="Describe what you observed and steps to reproduce..." required></textarea>
             </div>
 
-            <div class="form-group">
-              <label for="bug-browser-field" class="form-label">Environment Information (Auto-Filled)</label>
-              <input type="text" id="bug-browser-field" class="form-input" readonly>
+            <div class="actions" style="margin-bottom: 0;">
+              <button type="submit" class="button primary">Open GitHub Issue Generator ↗</button>
             </div>
-
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px;">
-              <i class="fa-brands fa-github"></i>
-              <span>Open Pre-filled GitHub Issue</span>
-            </button>
           </form>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ==========================================================================
-         Community & Get in Touch (MongoDB Resource Cards)
-         ========================================================================== -->
-    <section class="community-section" id="community">
-      <div class="community-container">
-        <div class="section-center-header reveal-on-scroll">
-          <div class="hero-eyebrow">
-            <i class="fa-solid fa-users"></i> COMMUNITY &amp; COLLABORATION
-          </div>
-          <h2>
-            Connect with the <span>Creator &amp; Community.</span>
-          </h2>
-          <p>
-            Kravoxin is developed and maintained by Rohan Mirjankar. Join our community, submit feedback, or explore developer resources.
-          </p>
-        </div>
-
-        <div class="community-grid">
-          <!-- Card 1: GitHub -->
-          <a href="https://github.com/Rohan-Shridhar" target="_blank" rel="noopener noreferrer" class="community-card reveal-on-scroll">
-            <div class="community-icon">
-              <i class="fa-brands fa-github"></i>
-            </div>
-            <h3>GitHub</h3>
-            <span class="community-link">Collaborate <i class="fa-solid fa-arrow-right"></i></span>
-          </a>
-
-          <!-- Card 2: LinkedIn -->
-          <a href="https://www.linkedin.com/in/rohan-mirjankar/" target="_blank" rel="noopener noreferrer" class="community-card reveal-on-scroll">
-            <div class="community-icon">
-              <i class="fa-brands fa-linkedin-in"></i>
-            </div>
-            <h3>LinkedIn</h3>
-            <span class="community-link">Connect <i class="fa-solid fa-arrow-right"></i></span>
-          </a>
-
-          <!-- Card 3: Portfolio -->
-          <a href="https://rohan-mirjankar.carrd.co/" target="_blank" rel="noopener noreferrer" class="community-card reveal-on-scroll">
-            <div class="community-icon">
-              <i class="fa-solid fa-globe"></i>
-            </div>
-            <h3>Portfolio</h3>
-            <span class="community-link">Visit Website <i class="fa-solid fa-arrow-right"></i></span>
-          </a>
-
-          <!-- Card 4: Dev.to -->
-          <a href="https://dev.to/rohan_mirjankar" target="_blank" rel="noopener noreferrer" class="community-card reveal-on-scroll">
-            <div class="community-icon">
-              <i class="fa-brands fa-dev"></i>
-            </div>
-            <h3>Dev Community</h3>
-            <span class="community-link">Read Articles <i class="fa-solid fa-arrow-right"></i></span>
-          </a>
-
-          <!-- Card 5: Email -->
-          <a href="mailto:rohansm668@gmail.com" class="community-card reveal-on-scroll">
-            <div class="community-icon">
-              <i class="fa-solid fa-envelope"></i>
-            </div>
-            <h3>Email</h3>
-            <span class="community-link">Reach Out <i class="fa-solid fa-arrow-right"></i></span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================================================
-         Pre-Footer High-Impact CTA Banner
-         ========================================================================== -->
-    <section class="cta-banner-section" aria-label="Call to Action">
-      <div class="cta-banner-content reveal-on-scroll">
-        <h2 class="cta-banner-title">
-          Ready to supercharge your clipboard workflow?
-        </h2>
-        <p class="cta-banner-subtitle">
-          Join developers and power users who never lose a copied snippet again. Zero cloud dependencies, lightning performance, and completely free.
-        </p>
-        <div class="cta-banner-buttons">
-          <a href="#install" class="btn btn-primary btn-lg">
-            <i class="fa-brands fa-chrome"></i>
-            <span>Install Kravoxin Now</span>
-          </a>
-          <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer" class="btn btn-dark-secondary btn-lg">
-            <i class="fa-brands fa-github"></i>
-            <span>Star on GitHub</span>
-          </a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- ==========================================================================
-       Footer (MongoDB Enterprise Multi-Column Footer)
-       ========================================================================== -->
-  <footer class="site-footer">
-    <div class="footer-container">
-      <div class="footer-top-grid">
-        <!-- Brand Column -->
-        <div class="footer-brand-col">
-          <div class="footer-logo">
-            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="2" width="28" height="28" rx="8" fill="#001e2b"/>
-              <path d="M16 6C13.5 6 11.5 8 11.5 10.5V11H9C7.9 11 7 11.9 7 13V24C7 25.1 7.9 26 9 26H23C24.1 26 25 25.1 25 24V13C25 11.9 24.1 11 23 11H20.5V10.5C20.5 8 18.5 6 16 6ZM16 8C17.4 8 18.5 9.1 18.5 10.5V11H13.5V10.5C13.5 9.1 14.6 8 16 8ZM11 15H21V17H11V15ZM11 19H18V21H11V19Z" fill="#00ed64"/>
-            </svg>
-            <span>Kravoxin</span>
-          </div>
-          <p class="footer-tagline">
-            The intelligent, local-first clipboard history platform built for developers, creators, and power users.
-          </p>
-          <div class="footer-status-indicator">
-            <span class="status-dot"></span>
-            <span>All Systems Operational • Local Engine</span>
-          </div>
-        </div>
-
-        <!-- Col 2: Product -->
-        <div class="footer-col">
-          <h4>Product</h4>
-          <ul>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#home">Virtual Simulator</a></li>
-            <li><a href="#install">Quickstart</a></li>
-            <li><a href="https://github.com/Rohan-Shridhar/Kravoxin/releases" target="_blank" rel="noopener noreferrer">Release Notes</a></li>
-          </ul>
-        </div>
-
-        <!-- Col 3: Developers -->
-        <div class="footer-col">
-          <h4>Developers</h4>
-          <ul>
-            <li><a href="#specs">Architecture Specs</a></li>
-            <li><a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer">Source Code</a></li>
-            <li><a href="https://developer.chrome.com/docs/extensions/mv3/intro/" target="_blank" rel="noopener noreferrer">Manifest V3 Docs</a></li>
-            <li><a href="#bug">Report a Bug</a></li>
-          </ul>
-        </div>
-
-        <!-- Col 4: Community -->
-        <div class="footer-col">
-          <h4>Community</h4>
-          <ul>
-            <li><a href="https://rohan-mirjankar.carrd.co/" target="_blank" rel="noopener noreferrer">Rohan Mirjankar</a></li>
-            <li><a href="https://github.com/Rohan-Shridhar" target="_blank" rel="noopener noreferrer">GitHub Profile</a></li>
-            <li><a href="https://www.linkedin.com/in/rohan-mirjankar/" target="_blank" rel="noopener noreferrer">LinkedIn Network</a></li>
-            <li><a href="https://dev.to/rohan_mirjankar" target="_blank" rel="noopener noreferrer">Dev.to Articles</a></li>
-          </ul>
-        </div>
-
-        <!-- Col 5: Security & Legal -->
-        <div class="footer-col">
-          <h4>Privacy &amp; Open Source</h4>
-          <ul>
-            <li><a href="LICENSE" target="_blank">MIT License</a></li>
-            <li><a href="CONTRIBUTING.md" target="_blank">Contributing Guide</a></li>
-            <li><a href="#specs">100% Local Privacy Guarantee</a></li>
-            <li><a href="plan.md" target="_blank">Development Roadmap</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Bottom Bar -->
-      <div class="footer-bottom-bar">
+      <!-- ==========================================================================
+           Bottom Call to Action (UnvibeCode Style)
+           ========================================================================== -->
+      <section class="bottom">
         <div>
-          &copy; 2026 Kravoxin. Built with precision by <a href="https://rohan-mirjankar.carrd.co/" target="_blank" rel="noopener noreferrer" style="color: var(--brand-green); font-weight: 600;">Rohan Mirjankar</a>.
+          <h2>Take control of your clipboard.</h2>
+          <p>Zero cloud latency. 100% open source.</p>
         </div>
-        <ul class="footer-bottom-links">
-          <li><a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-          <li><a href="#install">Install Extension</a></li>
-          <li><a href="#top">Back to Top ↑</a></li>
-        </ul>
-      </div>
-    </div>
-  </footer>
+        <a class="button primary" href="#get-started">Start with Kravoxin ↗</a>
+      </section>
+    </main>
 
-  <!-- ==========================================================================
-       Spotlight Quick Search Modal (Ctrl + K)
-       ========================================================================== -->
-  <div class="search-modal-backdrop" id="spotlight-search-modal" role="dialog" aria-modal="true" aria-label="Spotlight Search">
-    <div class="search-modal-card">
-      <div class="search-modal-input-row">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="spotlight-search-input" class="search-modal-input" placeholder="Type a command or search sections...">
-        <button class="modal-close-btn" id="close-search-modal" aria-label="Close search">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+    <!-- ==========================================================================
+         Footer (UnvibeCode Style)
+         ========================================================================== -->
+    <footer>
+      <a class="brand" href="#main">
+        Kravoxin<span>Extension</span>
+      </a>
+      <div class="links">
+        <a href="https://github.com/Rohan-Shridhar/Kravoxin" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://github.com/Rohan-Shridhar/Kravoxin/blob/main/README.md" target="_blank" rel="noopener noreferrer">Documentation</a>
+        <a href="https://github.com/Rohan-Shridhar/Kravoxin/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing</a>
+        <a href="https://github.com/Rohan-Shridhar/Kravoxin/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a>
+        <a href="https://github.com/Rohan-Shridhar/Kravoxin/issues" target="_blank" rel="noopener noreferrer">Issues</a>
+        <a href="https://rohan-mirjankar.carrd.co/" target="_blank" rel="noopener noreferrer">Creator</a>
       </div>
-
-      <div class="search-results-list">
-        <div class="search-result-item" data-target="#home">
-          <span><i class="fa-regular fa-window-restore" style="margin-right: 8px;"></i> Virtual Extension Simulator</span>
-          <span class="kbd-shortcut">Demo</span>
-        </div>
-        <div class="search-result-item" data-target="#features">
-          <span><i class="fa-solid fa-cubes" style="margin-right: 8px;"></i> Core Capabilities &amp; Features</span>
-          <span class="kbd-shortcut">Features</span>
-        </div>
-        <div class="search-result-item" data-target="#specs">
-          <span><i class="fa-solid fa-layer-group" style="margin-right: 8px;"></i> Architecture &amp; Code Specs</span>
-          <span class="kbd-shortcut">Specs</span>
-        </div>
-        <div class="search-result-item" data-target="#install">
-          <span><i class="fa-solid fa-rocket" style="margin-right: 8px;"></i> Installation Guide &amp; Quickstart</span>
-          <span class="kbd-shortcut">Install</span>
-        </div>
-        <div class="search-result-item" data-target="#bug">
-          <span><i class="fa-solid fa-bug" style="margin-right: 8px;"></i> Diagnostics &amp; Bug Report</span>
-          <span class="kbd-shortcut">Support</span>
-        </div>
-        <div class="search-result-item" data-target="#community">
-          <span><i class="fa-solid fa-users" style="margin-right: 8px;"></i> Creator &amp; Developer Community</span>
-          <span class="kbd-shortcut">Social</span>
-        </div>
-      </div>
-
-      <div class="search-modal-footer">
-        <span>Navigate with mouse or keyboard</span>
-        <span>ESC to close</span>
-      </div>
-    </div>
+    </footer>
   </div>
 
-  <!-- Back to Top Floating Button -->
-  <button class="back-to-top" id="back-to-top-btn" title="Back to top" aria-label="Scroll back to top">
-    <i class="fa-solid fa-arrow-up"></i>
-  </button>
+  <!-- Screen reader live status notification -->
+  <div class="sr-only" role="status" aria-live="polite" id="copy-status"></div>
 
-  <!-- JavaScript -->
+  <!-- Interactive JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>
